@@ -1,0 +1,65 @@
+{
+  "sections": {
+    "main-collection-banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "show_collection_description": true,
+        "show_collection_image": false,
+        "color_scheme": "background-1"
+      }
+    },
+    "main-collection-product-grid": {
+      "type": "main-collection-product-grid",
+      "settings": {
+        "products_per_page": 24,
+        "image_ratio": "portrait",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "enable_filtering": true,
+        "enable_sorting": true,
+        "collapse_on_larger_devices": false,
+        "padding_top": 20,
+        "padding_bottom": 68
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "blocks": {
+        "newsletter-0": {
+          "type": "heading",
+          "settings": {
+            "heading": "Speak Truth in Love. Grow More Like Christ."
+          }
+        },
+        "newsletter-1": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Stay up to date with everything going on to be notified when new studies are released.<\/p>"
+          }
+        },
+        "newsletter-2": {
+          "type": "email_form",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "newsletter-0",
+        "newsletter-1",
+        "newsletter-2"
+      ],
+      "settings": {
+        "color_scheme": "accent-1",
+        "full_width": true,
+        "padding_top": 64,
+        "padding_bottom": 52
+      }
+    }
+  },
+  "order": [
+    "main-collection-banner",
+    "main-collection-product-grid",
+    "newsletter"
+  ]
+}

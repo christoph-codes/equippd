@@ -1,0 +1,101 @@
+{
+  "current": {
+    "colors_solid_button_labels": "#EFECEC",
+    "colors_accent_1": "#111111",
+    "colors_accent_2": "#ccc4c4",
+    "colors_text": "#111111",
+    "colors_outline_button_labels": "#8b8080",
+    "type_header_font": "rajdhani_n7",
+    "type_body_font": "roboto_n7",
+    "spacing_sections": 0,
+    "buttons_radius": 8,
+    "accent_icons": "accent-1",
+    "social_twitter_link": "https:\/\/twitter.com\/equippd",
+    "social_facebook_link": "https:\/\/facebook.com\/equippd",
+    "social_instagram_link": "https:\/\/instagram.com\/equippd",
+    "favicon": "shopify:\/\/shop_images\/eq19-icon-black.png",
+    "currency_code_enabled": true,
+    "checkout_header_image": "shopify:\/\/shop_images\/photo-1478147427282-58a87a120781.jpg",
+    "checkout_logo_image": "shopify:\/\/shop_images\/eq19-logo-light-v1.png",
+    "checkout_logo_position": "center",
+    "checkout_sidebar_background_color": "#EFECEC",
+    "checkout_accent_color": "#EFECEC",
+    "checkout_button_color": "#111111",
+    "sections": {
+      "announcement-bar": {
+        "type": "announcement-bar",
+        "blocks": {
+          "announcement-bar-0": {
+            "type": "announcement",
+            "settings": {
+              "text": "UNITY IN CHRIST",
+              "color_scheme": "accent-1",
+              "link": ""
+            }
+          }
+        },
+        "block_order": [
+          "announcement-bar-0"
+        ],
+        "settings": {
+        }
+      },
+      "header": {
+        "type": "header",
+        "settings": {
+          "color_scheme": "accent-1",
+          "logo": "shopify:\/\/shop_images\/equippd_full_white.png",
+          "logo_width": 170,
+          "logo_position": "top-center",
+          "menu": "main-menu",
+          "show_line_separator": false,
+          "enable_sticky_header": true,
+          "margin_bottom": 0
+        }
+      },
+      "footer": {
+        "type": "footer",
+        "blocks": {
+          "footer-0": {
+            "type": "link_list",
+            "settings": {
+              "heading": "Quick links",
+              "menu": "footer"
+            }
+          }
+        },
+        "block_order": [
+          "footer-0"
+        ],
+        "settings": {
+          "color_scheme": "inverse",
+          "newsletter_enable": false,
+          "newsletter_heading": "Subscribe to our emails",
+          "show_social": true,
+          "enable_country_selector": false,
+          "enable_language_selector": true,
+          "payment_enable": false,
+          "margin_top": 0,
+          "padding_top": 36,
+          "padding_bottom": 36
+        }
+      },
+      "main-password-header": {
+        "type": "main-password-header",
+        "settings": {
+          "logo_max_width": 100,
+          "color_scheme": "background-1"
+        }
+      },
+      "main-password-footer": {
+        "type": "main-password-footer",
+        "settings": {
+          "color_scheme": "background-1"
+        }
+      }
+    },
+    "content_for_index": [
+
+    ]
+  }
+}

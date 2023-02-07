@@ -1,0 +1,345 @@
+{
+  "sections": {
+    "16466326963ca174e6": {
+      "type": "image-banner",
+      "blocks": {
+        "1646632696141c6985-0": {
+          "type": "heading",
+          "disabled": true,
+          "settings": {
+            "heading": "\"Follow my example, as I follow the example of Christ.\" - Paul",
+            "heading_size": "large"
+          }
+        },
+        "1646632696141c6985-2": {
+          "type": "buttons",
+          "disabled": true,
+          "settings": {
+            "button_label_1": "Button label",
+            "button_link_1": "",
+            "button_style_secondary_1": false,
+            "button_label_2": "Button label",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "1646632696141c6985-0",
+        "1646632696141c6985-2"
+      ],
+      "settings": {
+        "image": "shopify:\/\/shop_images\/eq-home_hero.png",
+        "image_mbl": "shopify:\/\/shop_images\/eq-home_hero_mbl.png",
+        "image_overlay_opacity": 0,
+        "image_height": "medium",
+        "adapt_height_first_image": false,
+        "desktop_content_position": "middle-center",
+        "show_text_box": false,
+        "desktop_content_alignment": "center",
+        "color_scheme": "background-1",
+        "mobile_content_alignment": "left",
+        "stack_images_on_mobile": false,
+        "show_text_below": false
+      }
+    },
+    "164732384228d4f627": {
+      "type": "rich-text",
+      "blocks": {
+        "16473238421ad3590b-0": {
+          "type": "heading",
+          "settings": {
+            "heading": "TRAININGS",
+            "heading_size": "h1"
+          }
+        },
+        "16473238421ad3590b-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Trainings are our way to exercise and learn what it takes to grow spiritually in our walk with Christ and to recognize that God's word is essential for daily application.<\/p>"
+          }
+        },
+        "16473238421ad3590b-2": {
+          "type": "button",
+          "disabled": true,
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": [
+        "16473238421ad3590b-0",
+        "16473238421ad3590b-1",
+        "16473238421ad3590b-2"
+      ],
+      "settings": {
+        "color_scheme": "background-1",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 0
+      }
+    },
+    "multicolumn-1": {
+      "type": "multicolumn",
+      "blocks": {
+        "multicolumn-1": {
+          "type": "column",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/eq19-topicimages-discipleship-0619.jpg",
+            "title": "",
+            "text": "<p>Discipleship is essential for any follower of Christ as we are called to it. Let us help you walk through this topic to gain a more complete understanding.<\/p>",
+            "link_label": "STUDY DISCIPLESHIP",
+            "link": "shopify:\/\/blogs\/trainings"
+          }
+        },
+        "multicolumn-2": {
+          "type": "column",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/eq19-topicimages-christian_living-0619.jpg",
+            "title": "",
+            "text": "<p>Spiritual Trainings on Christian Living and why it is important for a believer of Christ.<\/p>",
+            "link_label": "STUDY CHRISTIAN LIVING",
+            "link": "shopify:\/\/blogs\/trainings"
+          }
+        }
+      },
+      "block_order": [
+        "multicolumn-1",
+        "multicolumn-2"
+      ],
+      "settings": {
+        "title": "",
+        "image_width": "full",
+        "image_ratio": "adapt",
+        "column_alignment": "center",
+        "background_style": "none",
+        "button_label": "",
+        "button_link": "",
+        "swipe_on_mobile": false,
+        "color_scheme": "background-1",
+        "padding_top": 48,
+        "padding_bottom": 28
+      }
+    },
+    "rich_text": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "UNIFYING THE BODY OF CHRIST",
+            "heading_size": "h1"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Equippd is a lifestyle brand that brings believers of Christ from all around who are striving to look more and more like Christ with the way they live their lives. We are committed to keeping the body of Christ unified as one as we are called to do through trainings, resources, apparel, and community. If you are new here, Welcome.<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "color_scheme": "inverse",
+        "full_width": true,
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "16473242773e8c43c1": {
+      "type": "rich-text",
+      "blocks": {
+        "1647324277a9b73a76-0": {
+          "type": "heading",
+          "settings": {
+            "heading": "Apparel",
+            "heading_size": "h1"
+          }
+        },
+        "1647324277a9b73a76-1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Inspiring apparel that acts as a personal reminder of the<br\/>biblical truths you live out daily. <br\/>#WearYourFaith<\/p>"
+          }
+        },
+        "1647324277a9b73a76-2": {
+          "type": "button",
+          "disabled": true,
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": [
+        "1647324277a9b73a76-0",
+        "1647324277a9b73a76-1",
+        "1647324277a9b73a76-2"
+      ],
+      "settings": {
+        "color_scheme": "background-1",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 24
+      }
+    },
+    "collection-list": {
+      "type": "collection-list",
+      "blocks": {
+        "collection-list-0": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "men"
+          }
+        },
+        "collection-list-1": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "women"
+          }
+        },
+        "collection-list-2": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "clarity-collection"
+          }
+        }
+      },
+      "block_order": [
+        "collection-list-0",
+        "collection-list-1",
+        "collection-list-2"
+      ],
+      "settings": {
+        "title": "",
+        "image_ratio": "portrait",
+        "color_scheme": "background-1",
+        "swipe_on_mobile": true,
+        "show_view_all": true,
+        "padding_top": 12,
+        "padding_bottom": 64
+      }
+    },
+    "video": {
+      "type": "video",
+      "disabled": true,
+      "settings": {
+        "heading": "Video",
+        "video_url": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "full_width": false,
+        "color_scheme": "background-1",
+        "padding_top": 28,
+        "padding_bottom": 40
+      }
+    },
+    "1647129561a5f798cd": {
+      "type": "image-banner",
+      "blocks": {
+        "164712956193aedec1-0": {
+          "type": "heading",
+          "settings": {
+            "heading": "MUSIC",
+            "heading_size": "medium"
+          }
+        },
+        "164712956193aedec1-1": {
+          "type": "text",
+          "settings": {
+            "text": "Come turn up with us as we've accumulated playlists of familiar sounds with songs that glorify God!",
+            "text_style": "body"
+          }
+        },
+        "164712956193aedec1-2": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "LISTEN NOW!",
+            "button_link_1": "shopify:\/\/pages\/music",
+            "button_style_secondary_1": false,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "164712956193aedec1-0",
+        "164712956193aedec1-1",
+        "164712956193aedec1-2"
+      ],
+      "settings": {
+        "image": "shopify:\/\/shop_images\/photo-1478147427282-58a87a120781.jpg",
+        "image_overlay_opacity": 0,
+        "image_height": "small",
+        "adapt_height_first_image": false,
+        "desktop_content_position": "middle-center",
+        "show_text_box": false,
+        "desktop_content_alignment": "center",
+        "color_scheme": "background-1",
+        "mobile_content_alignment": "center",
+        "stack_images_on_mobile": false,
+        "show_text_below": false
+      }
+    },
+    "16471963279a37bbcf": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "<div id=\"instagram-feed-box\"><\/div>",
+        "color_scheme": "inverse",
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "blocks": {
+        "newsletter-0": {
+          "type": "heading",
+          "settings": {
+            "heading": "Speak Truth In Love. Grow More Like Christ."
+          }
+        },
+        "newsletter-1": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Stay up to date with everything going on to be notified when new studies are released.<\/p>"
+          }
+        },
+        "newsletter-2": {
+          "type": "email_form",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "newsletter-0",
+        "newsletter-1",
+        "newsletter-2"
+      ],
+      "settings": {
+        "color_scheme": "accent-1",
+        "full_width": true,
+        "padding_top": 64,
+        "padding_bottom": 52
+      }
+    }
+  },
+  "order": [
+    "16466326963ca174e6",
+    "164732384228d4f627",
+    "multicolumn-1",
+    "rich_text",
+    "16473242773e8c43c1",
+    "collection-list",
+    "video",
+    "1647129561a5f798cd",
+    "16471963279a37bbcf",
+    "newsletter"
+  ]
+}

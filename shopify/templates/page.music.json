@@ -1,0 +1,131 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "1647290843c16f6c1e": {
+      "type": "multi-spotify-playlist",
+      "blocks": {
+        "16472908431aab65fb-0": {
+          "type": "column",
+          "settings": {
+            "title": "Worship",
+            "embedUrl": "https:\/\/open.spotify.com\/embed\/playlist\/3FwB2xSneX3HlinMg7EUDM",
+            "playlistUrl": ""
+          }
+        },
+        "16472908431aab65fb-1": {
+          "type": "column",
+          "settings": {
+            "title": "Gospel",
+            "embedUrl": "https:\/\/open.spotify.com\/embed\/playlist\/49B5SeADLtWGDNOEJw0Ann",
+            "playlistUrl": ""
+          }
+        },
+        "16472908431aab65fb-2": {
+          "type": "column",
+          "settings": {
+            "title": "Pop",
+            "embedUrl": "https:\/\/open.spotify.com\/embed\/playlist\/0T5C8mOi6iygBnNU5WBANh",
+            "playlistUrl": ""
+          }
+        },
+        "2eabac3e-54fb-4aaf-9a4e-6a2639ae93c6": {
+          "type": "column",
+          "settings": {
+            "title": "Rap",
+            "embedUrl": "https:\/\/open.spotify.com\/embed\/playlist\/2hjlwF6FbzHTgfvY9xsstB",
+            "playlistUrl": ""
+          }
+        },
+        "8d6d2680-ee58-4a05-b51d-6614d7645599": {
+          "type": "column",
+          "settings": {
+            "title": "R&B",
+            "embedUrl": "https:\/\/open.spotify.com\/embed\/playlist\/6zEzcvYbySsNKHT8wfOUer",
+            "playlistUrl": ""
+          }
+        },
+        "5c50303b-3e65-4faf-a1f6-1c4f28235d98": {
+          "type": "column",
+          "settings": {
+            "title": "Country",
+            "embedUrl": "https:\/\/open.spotify.com\/embed\/playlist\/33z1Q8ix7xcIu6iRbbbLDO",
+            "playlistUrl": ""
+          }
+        },
+        "404f33e3-8640-4e89-a32c-37c7831f646d": {
+          "type": "column",
+          "settings": {
+            "title": "Rock",
+            "embedUrl": "https:\/\/open.spotify.com\/embed\/playlist\/1WNCJPy31NkjcRQkvuWfHY",
+            "playlistUrl": ""
+          }
+        },
+        "05b8c52e-e3b8-48c4-b4a5-28b066af7dcb": {
+          "type": "column",
+          "settings": {
+            "title": "Party",
+            "embedUrl": "https:\/\/open.spotify.com\/embed\/playlist\/5UiBakNLKgaOziuCCgzM5m",
+            "playlistUrl": ""
+          }
+        }
+      },
+      "block_order": [
+        "16472908431aab65fb-0",
+        "16472908431aab65fb-1",
+        "16472908431aab65fb-2",
+        "2eabac3e-54fb-4aaf-9a4e-6a2639ae93c6",
+        "8d6d2680-ee58-4a05-b51d-6614d7645599",
+        "5c50303b-3e65-4faf-a1f6-1c4f28235d98",
+        "404f33e3-8640-4e89-a32c-37c7831f646d",
+        "05b8c52e-e3b8-48c4-b4a5-28b066af7dcb"
+      ],
+      "settings": {
+        "title": ""
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "blocks": {
+        "newsletter-0": {
+          "type": "heading",
+          "settings": {
+            "heading": "Speak Truth in Love. Grow More Like Christ."
+          }
+        },
+        "newsletter-1": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Stay up to date with everything going on to be notified when new studies are released.<\/p>"
+          }
+        },
+        "newsletter-2": {
+          "type": "email_form",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "newsletter-0",
+        "newsletter-1",
+        "newsletter-2"
+      ],
+      "settings": {
+        "color_scheme": "accent-1",
+        "full_width": true,
+        "padding_top": 64,
+        "padding_bottom": 52
+      }
+    }
+  },
+  "order": [
+    "main",
+    "1647290843c16f6c1e",
+    "newsletter"
+  ]
+}

@@ -1,0 +1,98 @@
+<style>
+  .multi-spotify-playlist {
+    padding-bottom: 5rem;
+  }
+  .spotify-playlists {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+  }
+  .spotify-playlist {
+    width: calc(50% - 1rem);
+  }
+  @media(max-width: 48rem) {
+	.spotify-playlist {
+      width: 100%;
+    }
+  }
+</style>
+<section class="multi-spotify-playlist">
+  <div class="page-width page-width--narrow">
+    <div class="spotify-playlists">
+  {% for block in section.blocks %}
+    <div class="spotify-playlist">
+    {%- if block.settings.title != blank -%}
+    	<h3>{{ block.settings.title | escape }}</h3>
+    {%- endif -%}
+  	<iframe 
+          src="{{ block.settings.embedUrl }}" 
+          width="100%" 
+          height="400" 
+          frameborder="0" 
+          allowtransparency="true" 
+          allow="encrypted-media"></iframe>
+      {% if block.settings.playlistUrl %}
+      <a href="{{ block.settings.playlistUrl }}" class="button">Listen on Shopify!</a>
+      {% endif %}
+    </div>
+  {% endfor %}
+  </div>
+</div>
+  </section>
+
+{% schema %}
+{
+  "name": "Multi Spotify Playlist",
+  "class": "section",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Equippd Music",
+	  "label": "Section Name"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Playlist",
+      "settings": [
+        {
+          	"type": "text",
+          	"id": "title",
+          	"default": "Genre",
+			"label": "t:sections.multi-spotify-playlist.blocks.column.settings.title.label"
+        },
+		{
+			"type": "text",
+          	"id": "embedUrl",
+          	"label": "Embed URL"
+		},
+		{
+			"type": "text",
+          	"id": "playlistUrl",
+          	"label": "Playlist URL"
+		}
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Spotify Multi Columns",
+      "blocks": [
+        {
+          "type": "column"
+        },
+        {
+          "type": "column"
+        },
+        {
+          "type": "column"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

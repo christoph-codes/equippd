@@ -1,0 +1,169 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "cc2490e0-bc72-49f7-bf72-93e40d21b6ab": {
+          "type": "shopify:\/\/apps\/product-reviews\/blocks\/star_rating\/bae150af-8da8-48b2-9867-398188115e5f",
+          "settings": {
+            "stars_fill_color": "#8b8080",
+            "star_size": 15,
+            "text_align": "flex-start",
+            "product": "{{product}}",
+            "stars_text_empty": "No reviews"
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+          }
+        },
+        "caption": {
+          "type": "text",
+          "settings": {
+            "text": "{{ product.metafields.descriptors.subtitle.value }}",
+            "text_style": "subtitle"
+          }
+        },
+        "c6462b4b-e72f-43b7-9b21-8416c0cad33d": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+          }
+        },
+        "quantity_selector": {
+          "type": "quantity_selector",
+          "settings": {
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {
+            "share_label": "Share"
+          }
+        },
+        "collapsible-tab-0": {
+          "type": "collapsible_tab",
+          "disabled": true,
+          "settings": {
+            "heading": "Materials",
+            "icon": "clipboard",
+            "content": "",
+            "page": ""
+          }
+        },
+        "collapsible-tab-1": {
+          "type": "collapsible_tab",
+          "disabled": true,
+          "settings": {
+            "heading": "Dimensions",
+            "icon": "ruler",
+            "content": "",
+            "page": ""
+          }
+        },
+        "collapsible-tab-2": {
+          "type": "collapsible_tab",
+          "disabled": true,
+          "settings": {
+            "heading": "Care information",
+            "icon": "heart",
+            "content": "",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "cc2490e0-bc72-49f7-bf72-93e40d21b6ab",
+        "title",
+        "caption",
+        "c6462b4b-e72f-43b7-9b21-8416c0cad33d",
+        "price",
+        "quantity_selector",
+        "buy_buttons",
+        "description",
+        "share",
+        "collapsible-tab-0",
+        "collapsible-tab-1",
+        "collapsible-tab-2"
+      ],
+      "settings": {
+        "enable_sticky_info": true,
+        "gallery_layout": "thumbnail_slider",
+        "media_size": "medium",
+        "mobile_thumbnails": "hide",
+        "hide_variants": false,
+        "enable_video_looping": false,
+        "padding_top": 36,
+        "padding_bottom": 44
+      }
+    },
+    "main-product-recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "You may also like",
+        "color_scheme": "background-1",
+        "image_ratio": "square",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": true,
+        "padding_top": 36,
+        "padding_bottom": 68
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "blocks": {
+        "newsletter-0": {
+          "type": "heading",
+          "settings": {
+            "heading": "Speak Truth in Love. Grow More Like Christ."
+          }
+        },
+        "newsletter-1": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Stay up to date with everything going on to be notified when new studies are released.<\/p>"
+          }
+        },
+        "newsletter-2": {
+          "type": "email_form",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "newsletter-0",
+        "newsletter-1",
+        "newsletter-2"
+      ],
+      "settings": {
+        "color_scheme": "accent-1",
+        "full_width": true,
+        "padding_top": 64,
+        "padding_bottom": 52
+      }
+    }
+  },
+  "order": [
+    "main",
+    "main-product-recommendations",
+    "newsletter"
+  ]
+}
