@@ -1,0 +1,134 @@
+[debug] [2026-05-14T17:13:52.687Z] ----------------------------------------------------------------------
+[debug] [2026-05-14T17:13:52.688Z] Command:       /Users/christoph_codes/.nvm/versions/node/v22.20.0/bin/node /Users/christoph_codes/.nvm/versions/node/v22.20.0/bin/firebase emulators:start --only auth,firestore --project equippdmobile
+[debug] [2026-05-14T17:13:52.688Z] CLI Version:   15.7.0
+[debug] [2026-05-14T17:13:52.688Z] Platform:      darwin
+[debug] [2026-05-14T17:13:52.689Z] Node Version:  v22.20.0
+[debug] [2026-05-14T17:13:52.689Z] Time:          Thu May 14 2026 10:13:52 GMT-0700 (Pacific Daylight Time)
+[debug] [2026-05-14T17:13:52.689Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-05-14T17:13:53.400Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-05-14T17:13:53.400Z] > authorizing via signed-in user (cjones@thekirkconcept.com)
+[debug] [2026-05-14T17:13:53.499Z] java version "25.0.1" 2025-10-21 LTS
+
+[debug] [2026-05-14T17:13:53.499Z] Java(TM) SE Runtime Environment (build 25.0.1+8-LTS-27)
+Java HotSpot(TM) 64-Bit Server VM (build 25.0.1+8-LTS-27, mixed mode, sharing)
+
+[debug] [2026-05-14T17:13:53.503Z] Parsed Java major version: 25
+[info] i  emulators: Starting emulators: auth, firestore {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth, firestore"}}
+[debug] [2026-05-14T17:13:53.628Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-05-14T17:13:53.628Z] assigned listening specs for emulators {"user":{"auth":[{"address":"0.0.0.0","family":"IPv4","port":9099}],"firestore":[{"address":"0.0.0.0","family":"IPv4","port":8080}],"firestore.websocket":[{"address":"0.0.0.0","family":"IPv4","port":9150}],"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-05-14T17:13:53.630Z] Write emulator hub locator at /var/folders/ww/b74470ds6ng1rmlnlj9cdk5c0000gn/T/hub-equippdmobile.json
+[debug] [2026-05-14T17:13:53.633Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2026-05-14T17:13:53.633Z] Ignoring unsupported arg: single_project_mode_error {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: single_project_mode_error"}}
+[debug] [2026-05-14T17:13:53.633Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","/Users/christoph_codes/.cache/firebase/emulators/cloud-firestore-emulator-v1.20.2.jar","--host","0.0.0.0","--port",8080,"--websocket_port",9150,"--project_id","equippdmobile","--rules","/Users/christoph_codes/projects/equippd/firebase/firestore.rules","--single_project_mode",true],"optionalArgs":["port","webchannel_port","host","rules","websocket_port","functions_emulator","seed_from_export","project_id","single_project_mode"],"joinArgs":false,"shell":false,"port":8080} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"/Users/christoph_codes/.cache/firebase/emulators/cloud-firestore-emulator-v1.20.2.jar\",\"--host\",\"0.0.0.0\",\"--port\",8080,\"--websocket_port\",9150,\"--project_id\",\"equippdmobile\",\"--rules\",\"/Users/christoph_codes/projects/equippd/firebase/firestore.rules\",\"--single_project_mode\",true],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"websocket_port\",\"functions_emulator\",\"seed_from_export\",\"project_id\",\"single_project_mode\"],\"joinArgs\":false,\"shell\":false,\"port\":8080}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to \u001b[1mfirestore-debug.log\u001b[22m"}}
+[debug] [2026-05-14T17:13:53.834Z] WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::allocateMemory has been called by io.netty.util.internal.PlatformDependent0$2 (file:/Users/christoph_codes/.cache/firebase/emulators/cloud-firestore-emulator-v1.20.2.jar)
+WARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$2
+WARNING: sun.misc.Unsafe::allocateMemory will be removed in a future release
+ {"metadata":{"emulator":{"name":"firestore"},"message":"WARNING: A terminally deprecated method in sun.misc.Unsafe has been called\nWARNING: sun.misc.Unsafe::allocateMemory has been called by io.netty.util.internal.PlatformDependent0$2 (file:/Users/christoph_codes/.cache/firebase/emulators/cloud-firestore-emulator-v1.20.2.jar)\nWARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$2\nWARNING: sun.misc.Unsafe::allocateMemory will be removed in a future release\n"}}
+[debug] [2026-05-14T17:13:54.260Z] May 14, 2026 10:13:54 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://0.0.0.0:9150
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:13:54 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start\nINFO: Started WebSocket server on ws://0.0.0.0:9150\n"}}
+[debug] [2026-05-14T17:13:54.274Z] API endpoint: http:// {"metadata":{"emulator":{"name":"firestore"},"message":"API endpoint: http://"}}
+[debug] [2026-05-14T17:13:54.274Z] 0.0.0.0:8080
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=0.0.0.0:8080
+
+If you are running a Firestore in Datastore Mode project, run:
+
+   export DATASTORE_EMULATOR_HOST=0.0.0.0:8080
+
+Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
+Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"0.0.0.0:8080\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\n\n   export FIRESTORE_EMULATOR_HOST=0.0.0.0:8080\n\nIf you are running a Firestore in Datastore Mode project, run:\n\n   export DATASTORE_EMULATOR_HOST=0.0.0.0:8080\n\nNote: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.\nDev App Server is now running.\n\n"}}
+[info] ✔  firestore: Firestore Emulator UI websocket is running on 9150. {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator UI websocket is running on 9150."}}
+[warn] ⚠  emulators: The Emulator UI is not starting because none of the running emulators have a UI component. {"metadata":{"emulator":{"name":"hub"},"message":"The Emulator UI is not starting because none of the running emulators have a UI component."}}
+[debug] [2026-05-14T17:13:57.090Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬──────────────┐
+│ Emulator       │ Host:Port    │
+├────────────────┼──────────────┤
+│ Authentication │ 0.0.0.0:9099 │
+├────────────────┼──────────────┤
+│ Firestore      │ 0.0.0.0:8080 │
+└────────────────┴──────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500, 9150
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2026-05-14T17:13:57.643Z] May 14, 2026 10:13:57 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:13:57 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:14:16.604Z] May 14, 2026 10:14:16 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:14:16 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:14:49.451Z] May 14, 2026 10:14:49 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketChannelHandler initChannel
+INFO: Connected to new websocket client
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:14:49 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketChannelHandler initChannel\nINFO: Connected to new websocket client\n"}}
+[info] i  firestore: Change detected, updating rules... 
+[debug] [2026-05-14T17:19:20.154Z] >>> [apiv2][query] PUT http://127.0.0.1:8080/emulator/v1/projects/equippdmobile:securityRules [none]
+[debug] [2026-05-14T17:19:20.156Z] >>> [apiv2][body] PUT http://127.0.0.1:8080/emulator/v1/projects/equippdmobile:securityRules {"ignore_errors":true,"rules":{"files":[{"name":"security.rules","content":"rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    function isSignedIn() {\n      return request.auth != null;\n    }\n\n    function isSelf(userId) {\n      return isSignedIn() && request.auth.uid == userId;\n    }\n\n    function isAdmin() {\n      return isSignedIn() && (\n        request.auth.token.admin == true ||\n        request.auth.token.role == 'admin' ||\n        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'\n      );\n    }\n\n    function doesNotWriteRole() {\n      return !request.resource.data.keys().hasAny(['role']);\n    }\n\n    function roleIsUnchanged() {\n      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']);\n    }\n\n    match /users/{userId} {\n      allow read: if isSelf(userId) || isAdmin();\n      allow create: if isSelf(userId) && doesNotWriteRole();\n      allow update: if isSelf(userId) && roleIsUnchanged();\n      allow delete: if false;\n    }\n\n    match /groups/{groupId} {\n      allow read: if isSignedIn();\n      allow write: if false;\n\n      match /members/{userId} {\n        // Use resource ownership for read so collectionGroup queries can be authorized.\n        allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);\n        allow write: if isSelf(userId) && request.resource.data.userId == request.auth.uid;\n      }\n    }\n\n    match /notes/{noteId} {\n      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;\n      allow read: if isSignedIn() && (request.auth.uid == resource.data.userId || isAdmin());\n      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;\n    }\n  }\n}\n"}]}}
+[debug] [2026-05-14T17:19:20.191Z] May 14, 2026 10:19:20 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:19:20 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:19:20.413Z] May 14, 2026 10:19:20 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:19:20 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:19:20.531Z] <<< [apiv2][status] PUT http://127.0.0.1:8080/emulator/v1/projects/equippdmobile:securityRules 200
+[debug] [2026-05-14T17:19:20.531Z] <<< [apiv2][body] PUT http://127.0.0.1:8080/emulator/v1/projects/equippdmobile:securityRules {}
+[info] ✔  firestore: Rules updated. 
+[info] i  firestore: Change detected, updating rules... 
+[debug] [2026-05-14T17:19:23.371Z] >>> [apiv2][query] PUT http://127.0.0.1:8080/emulator/v1/projects/equippdmobile:securityRules [none]
+[debug] [2026-05-14T17:19:23.371Z] >>> [apiv2][body] PUT http://127.0.0.1:8080/emulator/v1/projects/equippdmobile:securityRules {"ignore_errors":true,"rules":{"files":[{"name":"security.rules","content":"rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    function isSignedIn() {\n      return request.auth != null;\n    }\n\n    function isSelf(userId) {\n      return isSignedIn() && request.auth.uid == userId;\n    }\n\n    function isAdmin() {\n      return isSignedIn() && (\n        request.auth.token.admin == true ||\n        request.auth.token.role == 'admin' ||\n        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'\n      );\n    }\n\n    function doesNotWriteRole() {\n      return !request.resource.data.keys().hasAny(['role']);\n    }\n\n    function roleIsUnchanged() {\n      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']);\n    }\n\n    match /users/{userId} {\n      allow read: if isSelf(userId) || isAdmin();\n      allow create: if isSelf(userId) && doesNotWriteRole();\n      allow update: if isSelf(userId) && roleIsUnchanged();\n      allow delete: if false;\n    }\n\n    match /groups/{groupId} {\n      allow read: if isSignedIn();\n      allow write: if false;\n\n      match /members/{userId} {\n        // Use resource ownership for read so collectionGroup queries can be authorized.\n        allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);\n        allow write: if isSelf(userId) && request.resource.data.userId == request.auth.uid;\n      }\n    }\n\n    match /notes/{noteId} {\n      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;\n      allow read: if isSignedIn() && (request.auth.uid == resource.data.userId || isAdmin());\n      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;\n    }\n  }\n}\n"}]}}
+[debug] [2026-05-14T17:19:23.477Z] <<< [apiv2][status] PUT http://127.0.0.1:8080/emulator/v1/projects/equippdmobile:securityRules 200
+[debug] [2026-05-14T17:19:23.477Z] <<< [apiv2][body] PUT http://127.0.0.1:8080/emulator/v1/projects/equippdmobile:securityRules {}
+[info] ✔  firestore: Rules updated. 
+[debug] [2026-05-14T17:23:04.750Z] May 14, 2026 10:23:04 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:04 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:04.963Z] May 14, 2026 10:23:04 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:04 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.036Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.094Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\nMay 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.129Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.154Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.164Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.221Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.253Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.253Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.367Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.394Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}
+[debug] [2026-05-14T17:23:05.433Z] May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"May 14, 2026 10:23:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\nINFO: Detected non-HTTP/2 connection.\n"}}

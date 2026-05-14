@@ -55,6 +55,25 @@ export async function upsertUserProfile(profile: Pick<UserProfile, 'uid' | 'disp
   );
 }
 
+export async function fetchUserProfile(userId: string) {
+  const dbClient = requireDb();
+  const snapshot = await getDoc(doc(dbClient, 'users', userId));
+
+  if (!snapshot.exists()) {
+    return null;
+  }
+
+  const data = snapshot.data();
+  return {
+    uid: data.uid,
+    displayName: data.displayName,
+    email: data.email,
+    role: data.role,
+    createdAt: formatTimestamp(data.createdAt),
+    updatedAt: formatTimestamp(data.updatedAt),
+  } as UserProfile;
+}
+
 export function mapGroup(snapshot: QueryDocumentSnapshot<DocumentData>): Group {
   const data = snapshot.data();
   return {

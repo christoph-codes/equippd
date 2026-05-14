@@ -17,31 +17,34 @@ function notesQuery(...clauses: QueryConstraint[]) {
   return query(collection(dbClient, 'notes'), ...clauses);
 }
 
-export async function fetchRecentNotes(userId: string, max = 5): Promise<Note[]> {
-  const snapshot = await getDocs(
-    notesQuery(where('userId', '==', userId), orderBy('updatedAt', 'desc'), limit(max))
-  );
+export async function fetchRecentNotes(userId: string, max = 5, includeAll = false): Promise<Note[]> {
+  const clauses = includeAll
+    ? [orderBy('updatedAt', 'desc'), limit(max)]
+    : [where('userId', '==', userId), orderBy('updatedAt', 'desc'), limit(max)];
+  const snapshot = await getDocs(notesQuery(...clauses));
 
   return snapshot.docs.map(mapNote);
 }
 
-export async function fetchNotesByGroup(userId: string, groupSlug: string) {
-  const snapshot = await getDocs(
-    notesQuery(where('userId', '==', userId), where('groupSlug', '==', groupSlug), orderBy('updatedAt', 'desc'))
-  );
+export async function fetchNotesByGroup(userId: string, groupSlug: string, includeAll = false) {
+  const clauses = includeAll
+    ? [where('groupSlug', '==', groupSlug), orderBy('updatedAt', 'desc')]
+    : [where('userId', '==', userId), where('groupSlug', '==', groupSlug), orderBy('updatedAt', 'desc')];
+  const snapshot = await getDocs(notesQuery(...clauses));
 
   return snapshot.docs.map(mapNote);
 }
 
-export async function fetchNotesByStudy(userId: string, groupSlug: string, studySlug: string) {
-  const snapshot = await getDocs(
-    notesQuery(
-      where('userId', '==', userId),
-      where('groupSlug', '==', groupSlug),
-      where('studySlug', '==', studySlug),
-      orderBy('updatedAt', 'desc')
-    )
-  );
+export async function fetchNotesByStudy(userId: string, groupSlug: string, studySlug: string, includeAll = false) {
+  const clauses = includeAll
+    ? [where('groupSlug', '==', groupSlug), where('studySlug', '==', studySlug), orderBy('updatedAt', 'desc')]
+    : [
+        where('userId', '==', userId),
+        where('groupSlug', '==', groupSlug),
+        where('studySlug', '==', studySlug),
+        orderBy('updatedAt', 'desc'),
+      ];
+  const snapshot = await getDocs(notesQuery(...clauses));
 
   return snapshot.docs.map(mapNote);
 }

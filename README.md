@@ -12,6 +12,7 @@ This repository now contains the Equippd mobile app foundation built with **Expo
 - Group list + group detail + studies list + study detail
 - Study content driven by local MDX content structure
 - Personal note create/edit flow bound to user/group/study
+- Admin-aware read access for super users across groups, studies, and notes
 - Music discovery section with starter cards
 - Shop polished coming soon section
 - Settings with logout and setup visibility
@@ -40,6 +41,7 @@ This repository now contains the Equippd mobile app foundation built with **Expo
 - `/content/shop`
 
 Sample study files:
+
 - `/content/studies/the-fellas/isaiah-47.mdx`
 - `/content/studies/the-fellas/sample-study.mdx`
 
@@ -54,10 +56,48 @@ EXPO_PUBLIC_FIREBASE_PROJECT_ID=
 EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 EXPO_PUBLIC_FIREBASE_APP_ID=
+
+# Development emulator settings (recommended)
+EXPO_PUBLIC_USE_FIREBASE_EMULATORS=true
+EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1
+EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_PORT=9099
+EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_HOST=127.0.0.1
+EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_PORT=8080
 ```
 
 Firestore rules draft is in:
+
 - `/firebase/firestore.rules`
+
+## Firebase emulators (recommended for development)
+
+To avoid editing cloud Firebase records while developing, this app automatically connects to Auth + Firestore emulators in development by default.
+
+Start the emulators:
+
+```bash
+npx firebase-tools emulators:start --only auth,firestore
+```
+
+Then run the app:
+
+```bash
+npm run web
+```
+
+Notes:
+
+- You can force cloud Firebase in development by setting `EXPO_PUBLIC_USE_FIREBASE_EMULATORS=false`.
+- On physical devices, `127.0.0.1` points to the device itself. Set emulator host env vars to your machine LAN IP when needed.
+
+## Admin super user
+
+Provision the admin account in Firebase Authentication for each environment, then grant one of these server-controlled markers:
+
+- Preferred for production: set a Firebase custom claim on the user, either `admin: true` or `role: "admin"`.
+- Supported for dev and production: set the Firestore user profile document at `/users/{uid}` to include `role: "admin"`.
+
+The client detects either marker after login. Firestore rules allow admins to read all users, group memberships, and notes, while regular users can only read their own private data.
 
 ## Run locally
 

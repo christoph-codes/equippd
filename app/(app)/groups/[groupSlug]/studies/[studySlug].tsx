@@ -17,7 +17,7 @@ import { colors } from '@/src/theme/colors';
 export default function StudyDetailScreen() {
   const { groupSlug, studySlug } = useLocalSearchParams<{ groupSlug: string; studySlug: string }>();
   const router = useRouter();
-  const { user } = useAuth();
+  const { isAdmin, user } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
 
   const study = useMemo(() => loadStudy(groupSlug, studySlug), [groupSlug, studySlug]);
@@ -27,8 +27,8 @@ export default function StudyDetailScreen() {
       return;
     }
 
-    void fetchNotesByStudy(user.uid, groupSlug, studySlug).then(setNotes);
-  }, [groupSlug, studySlug, user]);
+    void fetchNotesByStudy(user.uid, groupSlug, studySlug, isAdmin).then(setNotes);
+  }, [groupSlug, isAdmin, studySlug, user]);
 
   if (!study) {
     return (
@@ -59,7 +59,7 @@ export default function StudyDetailScreen() {
         }
       />
 
-      <SectionHeader title="Your study notes" />
+      <SectionHeader title={isAdmin ? 'All Study Notes' : 'Your study notes'} />
       {notes.length ? (
         notes.map((note) => (
           <NoteCard key={note.id} note={note} onPress={() => router.push(`/(app)/notes/${note.id}`)} />

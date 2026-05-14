@@ -12,7 +12,7 @@ import { fetchNoteById, saveNote } from '@/src/services/firebase/firestore';
 import { colors } from '@/src/theme/colors';
 
 export default function NoteEditorScreen() {
-  const { user } = useAuth();
+  const { isAdmin, user } = useAuth();
   const router = useRouter();
   const params = useLocalSearchParams<{ noteId: string; groupSlug?: string; studySlug?: string; title?: string }>();
 
@@ -20,14 +20,17 @@ export default function NoteEditorScreen() {
   const [body, setBody] = useState('');
   const [groupSlug, setGroupSlug] = useState('');
   const [studySlug, setStudySlug] = useState('');
+  const [ownerId, setOwnerId] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const readOnly = isAdmin && Boolean(ownerId) && ownerId !== user?.uid;
 
   useEffect(() => {
     if (params.noteId === 'new') {
       setTitle(params.title ? `Notes: ${params.title}` : 'Study Notes');
       setGroupSlug(params.groupSlug ?? 'the-fellas');
       setStudySlug(params.studySlug ?? 'sample-study');
+      setOwnerId(user?.uid ?? '');
       return;
     }
 
@@ -39,8 +42,9 @@ export default function NoteEditorScreen() {
       setBody(note.body);
       setGroupSlug(note.groupSlug);
       setStudySlug(note.studySlug);
+      setOwnerId(note.userId);
     });
-  }, [params.groupSlug, params.noteId, params.studySlug, params.title]);
+  }, [params.groupSlug, params.noteId, params.studySlug, params.title, user]);
 
   async function onSave() {
     if (!user) {
@@ -54,7 +58,7 @@ export default function NoteEditorScreen() {
     try {
       const noteId = await saveNote({
         id: params.noteId,
-        userId: user.uid,
+        userId: ownerId || user.uid,
         groupSlug,
         studySlug,
         title,
@@ -70,14 +74,17 @@ export default function NoteEditorScreen() {
 
   return (
     <ScreenContainer>
-      <SectionHeader title={params.noteId === 'new' ? 'Add Note' : 'Edit Note'} subtitle="Personal study reflections" />
+      <SectionHeader
+        title={params.noteId === 'new' ? 'Add Note' : readOnly ? 'View Note' : 'Edit Note'}
+        subtitle={readOnly ? "Viewing another member's study reflections" : 'Personal study reflections'}
+      />
       <Card>
-        <TextInput label="Title" onChangeText={setTitle} value={title} />
-        <TextInput label="Group Slug" onChangeText={setGroupSlug} value={groupSlug} />
-        <TextInput label="Study Slug" onChangeText={setStudySlug} value={studySlug} />
-        <TextInput label="Body" multiline onChangeText={setBody} style={{ minHeight: 140, textAlignVertical: 'top' }} value={body} />
+        <TextInput editable={!readOnly} label="Title" onChangeText={setTitle} value={title} />
+        <TextInput editable={!readOnly} label="Group Slug" onChangeText={setGroupSlug} value={groupSlug} />
+        <TextInput editable={!readOnly} label="Study Slug" onChangeText={setStudySlug} value={studySlug} />
+        <TextInput editable={!readOnly} label="Body" multiline onChangeText={setBody} style={{ minHeight: 140, textAlignVertical: 'top' }} value={body} />
         {error ? <Text style={{ color: colors.danger }}>{error}</Text> : null}
-        <Button disabled={saving} label={saving ? 'Saving...' : 'Save note'} onPress={onSave} />
+        {readOnly ? null : <Button disabled={saving} label={saving ? 'Saving...' : 'Save note'} onPress={onSave} />}
       </Card>
     </ScreenContainer>
   );

@@ -14,7 +14,7 @@ import { fetchNotesByGroup } from '@/src/services/firebase/notes';
 export default function GroupDetailScreen() {
   const params = useLocalSearchParams<{ groupSlug: string }>();
   const router = useRouter();
-  const { user } = useAuth();
+  const { isAdmin, user } = useAuth();
   const [group, setGroup] = useState<Group | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
 
@@ -23,13 +23,13 @@ export default function GroupDetailScreen() {
       return;
     }
 
-    void Promise.all([fetchGroupBySlug(params.groupSlug), fetchNotesByGroup(user.uid, params.groupSlug)]).then(
+    void Promise.all([fetchGroupBySlug(params.groupSlug), fetchNotesByGroup(user.uid, params.groupSlug, isAdmin)]).then(
       ([nextGroup, nextNotes]) => {
         setGroup(nextGroup);
         setNotes(nextNotes);
       }
     );
-  }, [params.groupSlug, user]);
+  }, [isAdmin, params.groupSlug, user]);
 
   return (
     <ScreenContainer>
@@ -39,7 +39,7 @@ export default function GroupDetailScreen() {
         onPress={() => router.push(`/(app)/groups/${params.groupSlug}/studies`)}
       />
 
-      <SectionHeader title="Recent Group Notes" />
+      <SectionHeader title={isAdmin ? 'All Recent Group Notes' : 'Recent Group Notes'} />
       {notes.length ? (
         notes.map((note) => (
           <NoteCard key={note.id} note={note} onPress={() => router.push(`/(app)/notes/${note.id}`)} />

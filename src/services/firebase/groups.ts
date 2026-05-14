@@ -1,19 +1,8 @@
-import {
-  Timestamp,
-  collection,
-  collectionGroup,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  serverTimestamp,
-  setDoc,
-  where,
-} from 'firebase/firestore';
+import { Timestamp, collection, collectionGroup, doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
 
 import { Group } from '@/src/models/types';
 import { db } from '@/src/services/firebase/app';
-import { fetchGroupsBySlug } from '@/src/services/firebase/firestore';
+import { fetchGroupsBySlug, mapGroup } from '@/src/services/firebase/firestore';
 
 export const DEFAULT_GROUP_SLUG = 'the-fellas';
 
@@ -108,6 +97,16 @@ export async function fetchUserGroups(userId: string) {
   );
 
   return groups.filter(Boolean) as Group[];
+}
+
+export async function fetchAllGroups() {
+  const dbClient = requireDb();
+  const snapshot = await getDocs(collection(dbClient, 'groups'));
+  return snapshot.docs.map(mapGroup);
+}
+
+export async function fetchAccessibleGroups(userId: string, isAdmin: boolean) {
+  return isAdmin ? fetchAllGroups() : fetchUserGroups(userId);
 }
 
 export async function fetchGroupBySlug(slug: string) {

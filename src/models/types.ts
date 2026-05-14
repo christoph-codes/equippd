@@ -4,6 +4,7 @@ export type UserProfile = {
   uid: string;
   displayName: string;
   email: string;
+  role?: MemberRole;
   createdAt: string;
   updatedAt: string;
 };
