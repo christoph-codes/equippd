@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+# Firebase emulator data (local dev only)
+firebase/emulator-data/
+
 # Expo
 .expo/
 dist/

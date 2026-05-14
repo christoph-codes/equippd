@@ -34,7 +34,7 @@ export default function SignupScreen() {
 
   return (
     <ScreenContainer>
-      <SectionHeader title="Create your Equippd account" subtitle="Join your study group and start taking notes." />
+      <SectionHeader title="Create your Equippd account" subtitle="Create your platform account, then request access to the groups you want to join." />
       <Card>
         <TextInput label="Display name" onChangeText={setDisplayName} value={displayName} />
         <TextInput autoCapitalize="none" keyboardType="email-address" label="Email" onChangeText={setEmail} value={email} />

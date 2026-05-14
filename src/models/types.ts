@@ -1,4 +1,5 @@
 export type MemberRole = 'member' | 'leader' | 'admin';
+export type AccessRequestStatus = 'pending' | 'approved' | 'rejected';
 
 export type UserProfile = {
   uid: string;
@@ -23,6 +24,19 @@ export type GroupMembership = {
   userId: string;
   role: MemberRole;
   joinedAt: string;
+};
+
+export type GroupAccessRequest = {
+  id: string;
+  groupId: string;
+  groupSlug: string;
+  groupName: string;
+  userId: string;
+  userDisplayName: string;
+  userEmail: string;
+  status: AccessRequestStatus;
+  requestedAt: string;
+  updatedAt: string;
 };
 
 export type Note = {

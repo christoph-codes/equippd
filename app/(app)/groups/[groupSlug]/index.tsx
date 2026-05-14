@@ -8,7 +8,7 @@ import { ScreenContainer } from '@/src/components/ui/ScreenContainer';
 import { SectionHeader } from '@/src/components/ui/SectionHeader';
 import { useAuth } from '@/src/hooks/useAuth';
 import { Group, Note } from '@/src/models/types';
-import { fetchGroupBySlug } from '@/src/services/firebase/groups';
+import { canAccessGroup, fetchGroupBySlug } from '@/src/services/firebase/groups';
 import { fetchNotesByGroup } from '@/src/services/firebase/notes';
 
 export default function GroupDetailScreen() {
@@ -16,6 +16,8 @@ export default function GroupDetailScreen() {
   const router = useRouter();
   const { isAdmin, user } = useAuth();
   const [group, setGroup] = useState<Group | null>(null);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [accessChecked, setAccessChecked] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
 
   useEffect(() => {
@@ -23,13 +25,34 @@ export default function GroupDetailScreen() {
       return;
     }
 
-    void Promise.all([fetchGroupBySlug(params.groupSlug), fetchNotesByGroup(user.uid, params.groupSlug, isAdmin)]).then(
-      ([nextGroup, nextNotes]) => {
-        setGroup(nextGroup);
-        setNotes(nextNotes);
+    setAccessChecked(false);
+    void Promise.all([
+      fetchGroupBySlug(params.groupSlug),
+      canAccessGroup(user.uid, params.groupSlug, isAdmin),
+    ]).then(([nextGroup, nextHasAccess]) => {
+      setGroup(nextGroup);
+      setHasAccess(nextHasAccess);
+      setAccessChecked(true);
+
+      if (nextHasAccess) {
+        void fetchNotesByGroup(user.uid, params.groupSlug, isAdmin).then((nextNotes) => {
+          setNotes(nextNotes);
+        });
+      } else {
+        setNotes([]);
       }
-    );
+    });
   }, [isAdmin, params.groupSlug, user]);
+
+  if (accessChecked && !hasAccess) {
+    return (
+      <ScreenContainer>
+        <SectionHeader title={group?.name ?? 'Group'} subtitle={group?.description} />
+        <EmptyState title="Access required" description="Request access to this group before opening studies and notes." />
+        <Button label="Browse groups" onPress={() => router.replace('/(app)/groups')} />
+      </ScreenContainer>
+    );
+  }
 
   return (
     <ScreenContainer>

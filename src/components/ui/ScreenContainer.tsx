@@ -1,19 +1,26 @@
-import { PropsWithChildren } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { PropsWithChildren, ReactElement } from 'react';
+import { RefreshControlProps, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors } from '@/src/theme/colors';
 
 type Props = PropsWithChildren<{
   scroll?: boolean;
+  refreshControl?: ReactElement<RefreshControlProps>;
 }>;
 
-export function ScreenContainer({ children, scroll = true }: Props) {
+export function ScreenContainer({ children, refreshControl, scroll = true }: Props) {
   const content = <View style={styles.content}>{children}</View>;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {scroll ? <ScrollView style={styles.scroll}>{content}</ScrollView> : content}
+    <SafeAreaView edges={['left', 'right']} style={styles.safeArea}>
+      {scroll ? (
+        <ScrollView refreshControl={refreshControl} style={styles.scroll}>
+          {content}
+        </ScrollView>
+      ) : (
+        content
+      )}
     </SafeAreaView>
   );
 }

@@ -25,6 +25,12 @@ service cloud.firestore {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']);
     }
 
+    function isPendingSelfAccessRequest(userId) {
+      return isSelf(userId) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.status == 'pending';
+    }
+
     match /users/{userId} {
       allow read: if isSelf(userId) || isAdmin();
       allow create: if isSelf(userId) && doesNotWriteRole();
@@ -39,8 +45,35 @@ service cloud.firestore {
       match /members/{userId} {
         // Use resource ownership for read so collectionGroup queries can be authorized.
         allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
-        allow write: if isSelf(userId) && request.resource.data.userId == request.auth.uid;
+        allow write: if isAdmin();
       }
+
+      match /accessRequests/{userId} {
+        allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+        allow create: if isPendingSelfAccessRequest(userId);
+        allow update: if isAdmin() || (
+          isPendingSelfAccessRequest(userId) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['groupId', 'groupSlug', 'groupName', 'userId'])
+        );
+        allow delete: if isAdmin();
+      }
+    }
+
+    match /{path=**}/members/{userId} {
+      // Explicit collection group rules are required for collectionGroup(db, 'members').
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /{path=**}/accessRequests/{userId} {
+      // Explicit collection group rules are required for collectionGroup(db, 'accessRequests').
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isPendingSelfAccessRequest(userId);
+      allow update: if isAdmin() || (
+        isPendingSelfAccessRequest(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['groupId', 'groupSlug', 'groupName', 'userId'])
+      );
+      allow delete: if isAdmin();
     }
 
     match /notes/{noteId} {

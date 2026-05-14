@@ -19,7 +19,6 @@ import {
   fetchUserProfile,
   upsertUserProfile,
 } from "@/src/services/firebase/firestore";
-import { ensureDefaultMembership } from "@/src/services/firebase/groups";
 
 type AuthContextValue = {
   user: User | null;
@@ -79,10 +78,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       isAdmin,
       loading,
       signIn: async (email, password) => {
-        const credential = await login(email, password);
-        await ensureDefaultMembership(credential.user.uid).catch(() => {
-          // Group may not exist yet (e.g. empty emulator DB). Run `npm run seed:group` to seed it.
-        });
+        await login(email, password);
       },
       signUp: async (displayName, email, password) => {
         const credential = await signup(displayName, email, password);
@@ -90,9 +86,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
           uid: credential.user.uid,
           displayName,
           email,
-        });
-        await ensureDefaultMembership(credential.user.uid).catch(() => {
-          // Group may not exist yet (e.g. empty emulator DB). Run `npm run seed:group` to seed it.
         });
       },
       signOut: async () => {

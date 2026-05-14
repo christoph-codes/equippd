@@ -12,7 +12,8 @@
 			"port": 8080
 		},
 		"ui": {
-			"enabled": false
+			"enabled": true,
+			"port": 4000
 		}
 	}
 }

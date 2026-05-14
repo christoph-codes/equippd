@@ -7,10 +7,11 @@ export default function GroupsLayout() {
     <Stack
       screenOptions={{
         headerStyle: { backgroundColor: colors.background },
+        headerShadowVisible: false,
         headerTintColor: colors.text,
         contentStyle: { backgroundColor: colors.background },
       }}>
-      <Stack.Screen name="index" options={{ title: 'Groups' }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="[groupSlug]/index" options={{ title: 'Group' }} />
       <Stack.Screen name="[groupSlug]/studies/index" options={{ title: 'Studies' }} />
       <Stack.Screen name="[groupSlug]/studies/[studySlug]" options={{ title: 'Study' }} />

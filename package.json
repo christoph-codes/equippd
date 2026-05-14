@@ -9,7 +9,7 @@
 		"web": "expo start --web",
 		"lint": "expo lint",
 		"typecheck": "tsc --noEmit",
-		"emu": "firebase emulators:start --only auth,firestore --project equippdmobile",
+		"emu": "firebase emulators:start --project equippdmobile",
 		"seed:group": "node --env-file=.env ./scripts/seed-the-fellas.mjs"
 	},
 	"dependencies": {

@@ -11,6 +11,7 @@ import { SectionHeader } from '@/src/components/ui/SectionHeader';
 import { useAuth } from '@/src/hooks/useAuth';
 import { Note } from '@/src/models/types';
 import { loadStudy } from '@/src/services/content/mdx';
+import { canAccessGroup } from '@/src/services/firebase/groups';
 import { fetchNotesByStudy } from '@/src/services/firebase/notes';
 import { colors } from '@/src/theme/colors';
 
@@ -19,16 +20,40 @@ export default function StudyDetailScreen() {
   const router = useRouter();
   const { isAdmin, user } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [accessChecked, setAccessChecked] = useState(false);
 
   const study = useMemo(() => loadStudy(groupSlug, studySlug), [groupSlug, studySlug]);
 
   useEffect(() => {
-    if (!user) {
+    if (!groupSlug || !user) {
+      return;
+    }
+
+    setAccessChecked(false);
+    void canAccessGroup(user.uid, groupSlug, isAdmin).then((nextHasAccess) => {
+      setHasAccess(nextHasAccess);
+      setAccessChecked(true);
+    });
+  }, [groupSlug, isAdmin, user]);
+
+  useEffect(() => {
+    if (!user || !accessChecked || !hasAccess) {
+      setNotes([]);
       return;
     }
 
     void fetchNotesByStudy(user.uid, groupSlug, studySlug, isAdmin).then(setNotes);
-  }, [groupSlug, isAdmin, studySlug, user]);
+  }, [accessChecked, groupSlug, hasAccess, isAdmin, studySlug, user]);
+
+  if (accessChecked && !hasAccess) {
+    return (
+      <ScreenContainer>
+        <EmptyState title="Access required" description="Request access to this group before opening its studies." />
+        <Button label="Browse groups" onPress={() => router.replace('/(app)/groups')} />
+      </ScreenContainer>
+    );
+  }
 
   if (!study) {
     return (

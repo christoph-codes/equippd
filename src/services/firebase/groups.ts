@@ -1,6 +1,18 @@
-import { Timestamp, collection, collectionGroup, doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
+import {
+  Timestamp,
+  collection,
+  collectionGroup,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore';
 
-import { Group } from '@/src/models/types';
+import { Group, GroupAccessRequest, UserProfile } from '@/src/models/types';
 import { db } from '@/src/services/firebase/app';
 import { fetchGroupsBySlug, mapGroup } from '@/src/services/firebase/firestore';
 
@@ -67,6 +79,22 @@ export async function ensureDefaultMembership(userId: string) {
   return defaultGroup;
 }
 
+function mapAccessRequest(snapshot: { id: string; data: () => Record<string, unknown> }): GroupAccessRequest {
+  const data = snapshot.data();
+  return {
+    id: snapshot.id,
+    groupId: data.groupId as string,
+    groupSlug: data.groupSlug as string,
+    groupName: data.groupName as string,
+    userId: data.userId as string,
+    userDisplayName: data.userDisplayName as string,
+    userEmail: data.userEmail as string,
+    status: data.status as GroupAccessRequest['status'],
+    requestedAt: formatTimestamp(data.requestedAt),
+    updatedAt: formatTimestamp(data.updatedAt),
+  };
+}
+
 export async function fetchUserGroups(userId: string) {
   const dbClient = requireDb();
   const membershipSnapshot = await getDocs(
@@ -109,7 +137,78 @@ export async function fetchAccessibleGroups(userId: string, isAdmin: boolean) {
   return isAdmin ? fetchAllGroups() : fetchUserGroups(userId);
 }
 
+export async function canAccessGroup(userId: string, groupSlug: string, isAdmin: boolean) {
+  if (isAdmin) {
+    return true;
+  }
+
+  const groups = await fetchUserGroups(userId);
+  return groups.some((group) => group.slug === groupSlug);
+}
+
 export async function fetchGroupBySlug(slug: string) {
   const groups = await fetchGroupsBySlug(slug);
   return groups[0] ?? null;
+}
+
+export async function requestGroupAccess(group: Group, profile: UserProfile) {
+  const dbClient = requireDb();
+  const ref = doc(dbClient, 'groups', group.id, 'accessRequests', profile.uid);
+
+  await setDoc(
+    ref,
+    {
+      groupId: group.id,
+      groupSlug: group.slug,
+      groupName: group.name,
+      userId: profile.uid,
+      userDisplayName: profile.displayName,
+      userEmail: profile.email,
+      status: 'pending',
+      requestedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchUserAccessRequests(userId: string) {
+  const dbClient = requireDb();
+  const snapshot = await getDocs(
+    query(collectionGroup(dbClient, 'accessRequests'), where('userId', '==', userId))
+  );
+  return snapshot.docs.map(mapAccessRequest);
+}
+
+export async function fetchPendingAccessRequests() {
+  const dbClient = requireDb();
+  const snapshot = await getDocs(
+    query(collectionGroup(dbClient, 'accessRequests'), where('status', '==', 'pending'))
+  );
+  return snapshot.docs.map(mapAccessRequest);
+}
+
+export async function approveGroupAccessRequest(request: GroupAccessRequest, adminUserId: string) {
+  const dbClient = requireDb();
+  const memberRef = doc(dbClient, 'groups', request.groupId, 'members', request.userId);
+  const requestRef = doc(dbClient, 'groups', request.groupId, 'accessRequests', request.userId);
+  const batch = writeBatch(dbClient);
+
+  batch.set(
+    memberRef,
+    {
+      userId: request.userId,
+      role: 'member',
+      joinedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+
+  batch.update(requestRef, {
+    status: 'approved',
+    reviewedBy: adminUserId,
+    updatedAt: serverTimestamp(),
+  });
+
+  await batch.commit();
 }
