@@ -1,11 +1,11 @@
 import { ComingSoonPanel } from '@/src/components/ui/ComingSoonPanel';
 import { ScreenContainer } from '@/src/components/ui/ScreenContainer';
-import { SectionHeader } from '@/src/components/ui/SectionHeader';
+import { ScreenIntro } from '@/src/components/ui/ScreenIntro';
 
 export default function MusicScreen() {
   return (
     <ScreenContainer>
-      <SectionHeader title="Music" subtitle="Curated worship and discovery are coming soon." />
+      <ScreenIntro>Curated worship and discovery are coming soon.</ScreenIntro>
       <ComingSoonPanel
         title="Music"
         description="Music recommendations will return here as a dedicated tab experience."

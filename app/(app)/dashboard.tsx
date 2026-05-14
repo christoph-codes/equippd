@@ -8,7 +8,7 @@ import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
-import { SectionHeader } from "@/src/components/ui/SectionHeader";
+import { ScreenIntro } from "@/src/components/ui/ScreenIntro";
 import { useAuth } from "@/src/hooks/useAuth";
 import { Group, Note } from "@/src/models/types";
 import { fetchAccessibleGroups } from "@/src/services/firebase/groups";
@@ -42,10 +42,9 @@ export default function DashboardScreen() {
 
   return (
     <ScreenContainer>
-      <SectionHeader
-        title={`Welcome, ${user?.displayName || "Equippd Member"}`}
-        subtitle="Here is what needs your attention today."
-      />
+      <ScreenIntro>
+        {`Welcome, ${user?.displayName || "Equippd Member"}!`}
+      </ScreenIntro>
 
       {groups.length ? (
         <Card>

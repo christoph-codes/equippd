@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 
+import { BrandLogo } from '@/src/components/brand/BrandLogo';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { ScreenContainer } from '@/src/components/ui/ScreenContainer';
@@ -33,6 +34,7 @@ export default function LoginScreen() {
 
   return (
     <ScreenContainer>
+      <BrandLogo width={190} />
       <SectionHeader
         title="Welcome to Equippd"
         subtitle="Strengthen your walk through studies, notes, and brotherhood."

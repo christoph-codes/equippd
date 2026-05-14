@@ -7,6 +7,7 @@ import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
+import { ScreenIntro } from "@/src/components/ui/ScreenIntro";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { useAuth } from "@/src/hooks/useAuth";
 import { Group, GroupAccessRequest } from "@/src/models/types";
@@ -26,7 +27,9 @@ export default function GroupsScreen() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [memberships, setMemberships] = useState<Group[]>([]);
   const [requests, setRequests] = useState<GroupAccessRequest[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<GroupAccessRequest[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<GroupAccessRequest[]>(
+    [],
+  );
   const [busyId, setBusyId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -35,12 +38,13 @@ export default function GroupsScreen() {
       return;
     }
 
-    const [nextGroups, nextMemberships, nextRequests, nextPendingRequests] = await Promise.all([
-      fetchAllGroups(),
-      fetchUserGroups(user.uid),
-      fetchUserAccessRequests(user.uid),
-      isAdmin ? fetchPendingAccessRequests() : Promise.resolve([]),
-    ]);
+    const [nextGroups, nextMemberships, nextRequests, nextPendingRequests] =
+      await Promise.all([
+        fetchAllGroups(),
+        fetchUserGroups(user.uid),
+        fetchUserAccessRequests(user.uid),
+        isAdmin ? fetchPendingAccessRequests() : Promise.resolve([]),
+      ]);
 
     setGroups(nextGroups);
     setMemberships(nextMemberships);
@@ -67,22 +71,21 @@ export default function GroupsScreen() {
       return;
     }
 
-    void loadGroups()
-      .catch(() => {
-        setGroups([]);
-        setMemberships([]);
-        setRequests([]);
-        setPendingRequests([]);
-      });
+    void loadGroups().catch(() => {
+      setGroups([]);
+      setMemberships([]);
+      setRequests([]);
+      setPendingRequests([]);
+    });
   }, [loadGroups, user]);
 
   const membershipSlugs = useMemo(
     () => new Set(memberships.map((group) => group.slug)),
-    [memberships]
+    [memberships],
   );
   const requestStatusByGroupId = useMemo(
     () => new Map(requests.map((request) => [request.groupId, request.status])),
-    [requests]
+    [requests],
   );
 
   async function onRequestAccess(group: Group) {
@@ -122,15 +125,13 @@ export default function GroupsScreen() {
           tintColor={colors.accent}
           colors={[colors.accent]}
         />
-      }>
-      <SectionHeader
-        title="Bible Study Groups"
-        subtitle={
-          isAdmin
-            ? "Review access requests and manage group entry."
-            : "Browse available groups and request access from an admin."
-        }
-      />
+      }
+    >
+      <ScreenIntro>
+        {isAdmin
+          ? "Review access requests and manage group entry."
+          : "Browse available bible study groups"}
+      </ScreenIntro>
       {isAdmin && pendingRequests.length ? (
         <>
           <SectionHeader title="Pending Access Requests" />
@@ -138,7 +139,9 @@ export default function GroupsScreen() {
             <Card key={`${request.groupId}-${request.userId}`}>
               <Text style={styles.title}>{request.userDisplayName}</Text>
               <Text style={styles.meta}>{request.userEmail}</Text>
-              <Text style={styles.description}>Requested access to {request.groupName}</Text>
+              <Text style={styles.description}>
+                Requested access to {request.groupName}
+              </Text>
               <Button
                 disabled={busyId === request.id}
                 label={busyId === request.id ? "Approving..." : "Approve"}
@@ -175,7 +178,9 @@ export default function GroupsScreen() {
               ) : (
                 <Button
                   disabled={!profile || busyId === group.id}
-                  label={busyId === group.id ? "Requesting..." : "Request access"}
+                  label={
+                    busyId === group.id ? "Requesting..." : "Request access"
+                  }
                   onPress={() => onRequestAccess(group)}
                 />
               )}

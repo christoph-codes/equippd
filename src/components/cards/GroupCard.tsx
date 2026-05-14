@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Card } from '@/src/components/ui/Card';
 import { Group } from '@/src/models/types';
@@ -13,8 +13,10 @@ export function GroupCard({ group, onPress }: Props) {
   return (
     <Pressable onPress={onPress}>
       <Card>
-        <Text style={styles.title}>{group.name}</Text>
-        <Text style={styles.org}>{group.organization}</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>{group.name}</Text>
+          <Text style={styles.org}>{group.organization}</Text>
+        </View>
         <Text style={styles.description}>{group.description}</Text>
       </Card>
     </Pressable>
@@ -22,6 +24,9 @@ export function GroupCard({ group, onPress }: Props) {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    gap: 2,
+  },
   title: {
     color: colors.text,
     fontSize: 18,

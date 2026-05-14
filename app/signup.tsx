@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 
+import { BrandLogo } from '@/src/components/brand/BrandLogo';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { ScreenContainer } from '@/src/components/ui/ScreenContainer';
@@ -34,6 +35,7 @@ export default function SignupScreen() {
 
   return (
     <ScreenContainer>
+      <BrandLogo width={190} />
       <SectionHeader title="Create your Equippd account" subtitle="Create your platform account, then request access to the groups you want to join." />
       <Card>
         <TextInput label="Display name" onChangeText={setDisplayName} value={displayName} />

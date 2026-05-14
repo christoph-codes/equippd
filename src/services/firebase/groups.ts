@@ -10,19 +10,19 @@ import {
   setDoc,
   where,
   writeBatch,
-} from 'firebase/firestore';
+} from "firebase/firestore";
 
-import { Group, GroupAccessRequest, UserProfile } from '@/src/models/types';
-import { db } from '@/src/services/firebase/app';
-import { fetchGroupsBySlug, mapGroup } from '@/src/services/firebase/firestore';
+import { Group, GroupAccessRequest, UserProfile } from "@/src/models/types";
+import { db } from "@/src/services/firebase/app";
+import { fetchGroupsBySlug, mapGroup } from "@/src/services/firebase/firestore";
 
-export const DEFAULT_GROUP_SLUG = 'the-fellas';
+export const DEFAULT_GROUP_SLUG = "the-fellas";
 
 function formatTimestamp(value: unknown) {
   if (value instanceof Timestamp) {
     return value.toDate().toISOString();
   }
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return value;
   }
   return new Date().toISOString();
@@ -30,7 +30,9 @@ function formatTimestamp(value: unknown) {
 
 function requireDb() {
   if (!db) {
-    throw new Error('Firebase is not configured. Add EXPO_PUBLIC_FIREBASE_* variables.');
+    throw new Error(
+      "Firebase is not configured. Add EXPO_PUBLIC_FIREBASE_* variables.",
+    );
   }
 
   return db;
@@ -44,12 +46,12 @@ export async function ensureDefaultGroup() {
     return existing[0];
   }
 
-  const ref = doc(collection(dbClient, 'groups'));
+  const ref = doc(collection(dbClient, "groups"));
   await setDoc(ref, {
-    name: 'The Fellas',
+    name: "The Fellas",
     slug: DEFAULT_GROUP_SLUG,
-    description: 'A men’s Bible study group under the Equippd organization',
-    organization: 'Equippd',
+    description: "A men’s Bible study group under the Equippd organization",
+    organization: "Equippd",
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -57,29 +59,32 @@ export async function ensureDefaultGroup() {
   const created = await getDoc(ref);
   return {
     id: created.id,
-    ...(created.data() as Omit<Group, 'id'>),
+    ...(created.data() as Omit<Group, "id">),
   };
 }
 
 export async function ensureDefaultMembership(userId: string) {
   const dbClient = requireDb();
   const defaultGroup = await ensureDefaultGroup();
-  const memberRef = doc(dbClient, 'groups', defaultGroup.id, 'members', userId);
+  const memberRef = doc(dbClient, "groups", defaultGroup.id, "members", userId);
 
   await setDoc(
     memberRef,
     {
       userId,
-      role: 'member',
+      role: "member",
       joinedAt: serverTimestamp(),
     },
-    { merge: true }
+    { merge: true },
   );
 
   return defaultGroup;
 }
 
-function mapAccessRequest(snapshot: { id: string; data: () => Record<string, unknown> }): GroupAccessRequest {
+function mapAccessRequest(snapshot: {
+  id: string;
+  data: () => Record<string, unknown>;
+}): GroupAccessRequest {
   const data = snapshot.data();
   return {
     id: snapshot.id,
@@ -89,7 +94,7 @@ function mapAccessRequest(snapshot: { id: string; data: () => Record<string, unk
     userId: data.userId as string,
     userDisplayName: data.userDisplayName as string,
     userEmail: data.userEmail as string,
-    status: data.status as GroupAccessRequest['status'],
+    status: data.status as GroupAccessRequest["status"],
     requestedAt: formatTimestamp(data.requestedAt),
     updatedAt: formatTimestamp(data.updatedAt),
   };
@@ -98,7 +103,7 @@ function mapAccessRequest(snapshot: { id: string; data: () => Record<string, unk
 export async function fetchUserGroups(userId: string) {
   const dbClient = requireDb();
   const membershipSnapshot = await getDocs(
-    query(collectionGroup(dbClient, 'members'), where('userId', '==', userId))
+    query(collectionGroup(dbClient, "members"), where("userId", "==", userId)),
   );
 
   const groups = await Promise.all(
@@ -121,7 +126,7 @@ export async function fetchUserGroups(userId: string) {
         createdAt: formatTimestamp(data.createdAt),
         updatedAt: formatTimestamp(data.updatedAt),
       } as Group;
-    })
+    }),
   );
 
   return groups.filter(Boolean) as Group[];
@@ -129,7 +134,7 @@ export async function fetchUserGroups(userId: string) {
 
 export async function fetchAllGroups() {
   const dbClient = requireDb();
-  const snapshot = await getDocs(collection(dbClient, 'groups'));
+  const snapshot = await getDocs(collection(dbClient, "groups"));
   return snapshot.docs.map(mapGroup);
 }
 
@@ -137,7 +142,11 @@ export async function fetchAccessibleGroups(userId: string, isAdmin: boolean) {
   return isAdmin ? fetchAllGroups() : fetchUserGroups(userId);
 }
 
-export async function canAccessGroup(userId: string, groupSlug: string, isAdmin: boolean) {
+export async function canAccessGroup(
+  userId: string,
+  groupSlug: string,
+  isAdmin: boolean,
+) {
   if (isAdmin) {
     return true;
   }
@@ -153,7 +162,7 @@ export async function fetchGroupBySlug(slug: string) {
 
 export async function requestGroupAccess(group: Group, profile: UserProfile) {
   const dbClient = requireDb();
-  const ref = doc(dbClient, 'groups', group.id, 'accessRequests', profile.uid);
+  const ref = doc(dbClient, "groups", group.id, "accessRequests", profile.uid);
 
   await setDoc(
     ref,
@@ -164,18 +173,21 @@ export async function requestGroupAccess(group: Group, profile: UserProfile) {
       userId: profile.uid,
       userDisplayName: profile.displayName,
       userEmail: profile.email,
-      status: 'pending',
+      status: "pending",
       requestedAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     },
-    { merge: true }
+    { merge: true },
   );
 }
 
 export async function fetchUserAccessRequests(userId: string) {
   const dbClient = requireDb();
   const snapshot = await getDocs(
-    query(collectionGroup(dbClient, 'accessRequests'), where('userId', '==', userId))
+    query(
+      collectionGroup(dbClient, "accessRequests"),
+      where("userId", "==", userId),
+    ),
   );
   return snapshot.docs.map(mapAccessRequest);
 }
@@ -183,29 +195,47 @@ export async function fetchUserAccessRequests(userId: string) {
 export async function fetchPendingAccessRequests() {
   const dbClient = requireDb();
   const snapshot = await getDocs(
-    query(collectionGroup(dbClient, 'accessRequests'), where('status', '==', 'pending'))
+    query(
+      collectionGroup(dbClient, "accessRequests"),
+      where("status", "==", "pending"),
+    ),
   );
   return snapshot.docs.map(mapAccessRequest);
 }
 
-export async function approveGroupAccessRequest(request: GroupAccessRequest, adminUserId: string) {
+export async function approveGroupAccessRequest(
+  request: GroupAccessRequest,
+  adminUserId: string,
+) {
   const dbClient = requireDb();
-  const memberRef = doc(dbClient, 'groups', request.groupId, 'members', request.userId);
-  const requestRef = doc(dbClient, 'groups', request.groupId, 'accessRequests', request.userId);
+  const memberRef = doc(
+    dbClient,
+    "groups",
+    request.groupId,
+    "members",
+    request.userId,
+  );
+  const requestRef = doc(
+    dbClient,
+    "groups",
+    request.groupId,
+    "accessRequests",
+    request.userId,
+  );
   const batch = writeBatch(dbClient);
 
   batch.set(
     memberRef,
     {
       userId: request.userId,
-      role: 'member',
+      role: "member",
       joinedAt: serverTimestamp(),
     },
-    { merge: true }
+    { merge: true },
   );
 
   batch.update(requestRef, {
-    status: 'approved',
+    status: "approved",
     reviewedBy: adminUserId,
     updatedAt: serverTimestamp(),
   });
