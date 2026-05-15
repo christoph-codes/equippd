@@ -5,6 +5,8 @@ node_modules/
 
 # Firebase emulator data (local dev only)
 firebase/emulator-data/
+firebase-debug.log
+firestore-debug.log
 
 # Expo
 .expo/
