@@ -7,10 +7,12 @@ type Props = TextInputProps & {
 };
 
 export function TextInput({ label, ...rest }: Props) {
+  const { style, ...inputProps } = rest;
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <RNTextInput placeholderTextColor={colors.mutedText} style={styles.input} {...rest} />
+      <RNTextInput placeholderTextColor={colors.mutedText} style={[styles.input, style]} {...inputProps} />
     </View>
   );
 }

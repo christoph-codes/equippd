@@ -3,40 +3,32 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { GroupCard } from "@/src/components/cards/GroupCard";
-import { NoteCard } from "@/src/components/cards/NoteCard";
 import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { ScreenIntro } from "@/src/components/ui/ScreenIntro";
 import { useAuth } from "@/src/hooks/useAuth";
-import { Group, Note } from "@/src/models/types";
+import { Group } from "@/src/models/types";
 import { fetchAccessibleGroups } from "@/src/services/firebase/groups";
-import { fetchRecentNotes } from "@/src/services/firebase/notes";
 import { colors } from "@/src/theme/colors";
 
 export default function DashboardScreen() {
   const router = useRouter();
   const { isAdmin, user } = useAuth();
   const [groups, setGroups] = useState<Group[]>([]);
-  const [notes, setNotes] = useState<Note[]>([]);
 
   useEffect(() => {
     if (!user) {
       return;
     }
 
-    void Promise.all([
-      fetchAccessibleGroups(user.uid, isAdmin),
-      fetchRecentNotes(user.uid, 5, isAdmin),
-    ])
-      .then(([nextGroups, nextNotes]) => {
+    void fetchAccessibleGroups(user.uid, isAdmin)
+      .then((nextGroups) => {
         setGroups(nextGroups);
-        setNotes(nextNotes);
       })
       .catch(() => {
         setGroups([]);
-        setNotes([]);
       });
   }, [isAdmin, user]);
 
@@ -81,31 +73,6 @@ export default function DashboardScreen() {
           />
         </>
       )}
-
-      {notes.length ? (
-        <Card>
-          <View style={styles.row}>
-            <View style={styles.copy}>
-              <Text style={styles.title}>
-                {isAdmin ? "Recent notes" : "Your recent notes"}
-              </Text>
-              <Text style={styles.description}>
-                {isAdmin
-                  ? "Latest reflections from across accessible groups."
-                  : "Pick up where you left off."}
-              </Text>
-            </View>
-            <Button label="Notes" onPress={() => router.push("/(app)/notes")} />
-          </View>
-          {notes.slice(0, 2).map((note) => (
-            <NoteCard
-              key={note.id}
-              note={note}
-              onPress={() => router.push(`/(app)/notes/${note.id}`)}
-            />
-          ))}
-        </Card>
-      ) : null}
     </ScreenContainer>
   );
 }

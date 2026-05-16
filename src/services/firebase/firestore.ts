@@ -4,6 +4,7 @@ import {
   Timestamp,
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -147,4 +148,9 @@ export async function saveNote(note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'
   });
 
   return ref.id;
+}
+
+export async function deleteNote(noteId: string) {
+  const dbClient = requireDb();
+  await deleteDoc(doc(dbClient, 'notes', noteId));
 }

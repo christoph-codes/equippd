@@ -1,74 +1,108 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useNavigation } from "@react-navigation/native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useLayoutEffect, useState } from "react";
 
-import { NoteCard } from '@/src/components/cards/NoteCard';
-import { Button } from '@/src/components/ui/Button';
-import { EmptyState } from '@/src/components/ui/EmptyState';
-import { ScreenContainer } from '@/src/components/ui/ScreenContainer';
-import { SectionHeader } from '@/src/components/ui/SectionHeader';
-import { useAuth } from '@/src/hooks/useAuth';
-import { Group, Note } from '@/src/models/types';
-import { canAccessGroup, fetchGroupBySlug } from '@/src/services/firebase/groups';
-import { fetchNotesByGroup } from '@/src/services/firebase/notes';
+import { NoteCard } from "@/src/components/cards/NoteCard";
+import { StudyCard } from "@/src/components/cards/StudyCard";
+import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
+import { SectionHeader } from "@/src/components/ui/SectionHeader";
+import { useAuth } from "@/src/hooks/useAuth";
+import { Group, Note } from "@/src/models/types";
+import { loadStudiesByGroup } from "@/src/services/content/mdx";
+import { fetchGroupBySlug } from "@/src/services/firebase/groups";
+import { fetchNotesByGroup } from "@/src/services/firebase/notes";
 
 export default function GroupDetailScreen() {
   const params = useLocalSearchParams<{ groupSlug: string }>();
   const router = useRouter();
+  const navigation = useNavigation();
   const { isAdmin, user } = useAuth();
   const [group, setGroup] = useState<Group | null>(null);
-  const [hasAccess, setHasAccess] = useState(false);
-  const [accessChecked, setAccessChecked] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
+  const studies = loadStudiesByGroup(params.groupSlug ?? "");
+  const latestStudies = studies.slice(0, 3);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: group?.name ?? "Group",
+      headerTitleAlign: "center",
+      headerBackTitle: "Groups",
+      headerBackButtonDisplayMode: "minimal",
+    });
+  }, [group?.name, navigation]);
 
   useEffect(() => {
-    if (!params.groupSlug || !user) {
+    if (!params.groupSlug) {
       return;
     }
 
-    setAccessChecked(false);
-    void Promise.all([
-      fetchGroupBySlug(params.groupSlug),
-      canAccessGroup(user.uid, params.groupSlug, isAdmin),
-    ]).then(([nextGroup, nextHasAccess]) => {
+    void fetchGroupBySlug(params.groupSlug).then((nextGroup) => {
       setGroup(nextGroup);
-      setHasAccess(nextHasAccess);
-      setAccessChecked(true);
-
-      if (nextHasAccess) {
-        void fetchNotesByGroup(user.uid, params.groupSlug, isAdmin).then((nextNotes) => {
-          setNotes(nextNotes);
-        });
-      } else {
-        setNotes([]);
-      }
     });
-  }, [isAdmin, params.groupSlug, user]);
+  }, [params.groupSlug]);
 
-  if (accessChecked && !hasAccess) {
-    return (
-      <ScreenContainer>
-        <SectionHeader title={group?.name ?? 'Group'} subtitle={group?.description} />
-        <EmptyState title="Access required" description="Request access to this group before opening studies and notes." />
-        <Button label="Browse groups" onPress={() => router.replace('/(app)/groups')} />
-      </ScreenContainer>
+  useEffect(() => {
+    if (!params.groupSlug || !user) {
+      setNotes([]);
+      return;
+    }
+
+    void fetchNotesByGroup(user.uid, params.groupSlug, isAdmin).then(
+      (nextNotes) => {
+        setNotes(nextNotes);
+      },
     );
-  }
+  }, [isAdmin, params.groupSlug, user]);
 
   return (
     <ScreenContainer>
-      <SectionHeader title={group?.name ?? 'Group'} subtitle={group?.description} />
-      <Button
-        label="View studies"
-        onPress={() => router.push(`/(app)/groups/${params.groupSlug}/studies`)}
+      <SectionHeader
+        title={group?.name ?? "Group"}
+        subtitle={group?.description}
       />
 
-      <SectionHeader title={isAdmin ? 'All Recent Group Notes' : 'Recent Group Notes'} />
-      {notes.length ? (
-        notes.map((note) => (
-          <NoteCard key={note.id} note={note} onPress={() => router.push(`/(app)/notes/${note.id}`)} />
+      <SectionHeader
+        title="Latest Studies"
+        subtitle={
+          studies.length > 3
+            ? "Showing the latest 3 studies for this group."
+            : undefined
+        }
+      />
+      {latestStudies.length ? (
+        latestStudies.map((study) => (
+          <StudyCard
+            key={study.slug}
+            study={study}
+            onPress={() =>
+              router.push(
+                `/(app)/groups/${params.groupSlug}/studies/${study.slug}`,
+              )
+            }
+          />
         ))
       ) : (
-        <EmptyState title="No notes yet" description="Group notes tied to this group will appear here." />
+        <EmptyState
+          title="No studies yet"
+          description="Studies for this group will appear here."
+        />
+      )}
+
+      <SectionHeader title="Announcements" />
+      {notes.length ? (
+        notes.map((note) => (
+          <NoteCard
+            key={note.id}
+            note={note}
+            onPress={() => router.push(`/(app)/notes/${note.id}`)}
+          />
+        ))
+      ) : (
+        <EmptyState
+          title="No announcements yet"
+          description="Announcements for this group will appear here."
+        />
       )}
     </ScreenContainer>
   );

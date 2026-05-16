@@ -1,7 +1,7 @@
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
-import * as FirebaseAuth from "firebase/auth";
 import type { Auth } from "firebase/auth";
+import * as FirebaseAuth from "firebase/auth";
 import {
   Firestore,
   connectFirestoreEmulator,
@@ -27,18 +27,24 @@ const emulatorGlobalState = globalThis as typeof globalThis &
 
 const getReactNativePersistenceCompat = (
   FirebaseAuth as unknown as {
-    getReactNativePersistence?: (storage: typeof ReactNativeAsyncStorage) => unknown;
+    getReactNativePersistence?: (
+      storage: typeof ReactNativeAsyncStorage,
+    ) => unknown;
   }
 ).getReactNativePersistence;
 
 if (isFirebaseConfigured()) {
   app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   if (!getReactNativePersistenceCompat) {
-    throw new Error("Firebase React Native persistence helper is unavailable in this SDK build.");
+    throw new Error(
+      "Firebase React Native persistence helper is unavailable in this SDK build.",
+    );
   }
 
   const authClient = FirebaseAuth.initializeAuth(app, {
-    persistence: getReactNativePersistenceCompat(ReactNativeAsyncStorage) as FirebaseAuth.Persistence,
+    persistence: getReactNativePersistenceCompat(
+      ReactNativeAsyncStorage,
+    ) as FirebaseAuth.Persistence,
   });
   auth = authClient;
   db = getFirestore(app);
