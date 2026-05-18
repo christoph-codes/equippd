@@ -17,6 +17,7 @@ import { EmptyState } from "@/src/components/ui/EmptyState";
 import { Modal } from "@/src/components/ui/Modal";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
+import { NoteCard } from "@/src/components/cards/NoteCard";
 import { useAuth } from "@/src/hooks/useAuth";
 import { Note, Study } from "@/src/models/types";
 import {
@@ -333,36 +334,12 @@ export default function StudyDetailScreen() {
         <SectionHeader title="Notes" />
         {notes.length ? (
           notes.map((note) => (
-            <View key={note.id} style={styles.noteCard}>
-              <View style={styles.noteHeader}>
-                <View style={styles.avatarContainer}>
-                  <Text style={styles.avatarText}>
-                    {(note.userDisplayName || "U")
-                      .split(" ")
-                      .slice(0, 2)
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
-                  </Text>
-                </View>
-                <View style={styles.noteMeta}>
-                  <Text style={styles.noteAuthor}>
-                    {note.userDisplayName || "Unknown User"}
-                  </Text>
-                  <Text style={styles.noteTitle}>{note.title}</Text>
-                </View>
-              </View>
-              <Text style={styles.noteBody} numberOfLines={3}>
-                {note.body}
-              </Text>
-              <View style={styles.noteActions}>
-                <Pressable
-                  onPress={() => router.push(`/(app)/notes/${note.id}`)}
-                >
-                  <Text style={styles.viewNote}>View →</Text>
-                </Pressable>
-              </View>
-            </View>
+            <NoteCard
+              key={note.id}
+              note={note}
+              userDisplayName={note.userDisplayName}
+              onPress={() => router.push(`/(app)/notes/${note.id}`)}
+            />
           ))
         ) : (
           <EmptyState
@@ -710,58 +687,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  noteCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    gap: 8,
-  },
-  noteHeader: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-  },
-  avatarContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.accent,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: {
-    color: colors.accentText,
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  noteMeta: {
-    flex: 1,
-  },
-  noteAuthor: {
-    color: colors.text,
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  noteTitle: {
-    color: colors.mutedText,
-    fontSize: 12,
-    marginTop: 2,
-  },
-  noteBody: {
-    color: colors.text,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  noteActions: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopColor: colors.border,
-    borderTopWidth: 1,
-  },
   studyReactionRow: {
     flexDirection: "row",
     gap: 10,
@@ -793,11 +718,6 @@ const styles = StyleSheet.create({
   },
   reactionCountActive: {
     color: colors.accentText,
-  },
-  viewNote: {
-    color: colors.accent,
-    fontSize: 12,
-    fontWeight: "700",
   },
   buttonText: {
     color: colors.accentText,
@@ -870,14 +790,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   modalFormContent: {
-    paddingTop: 16,
-    paddingBottom: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   label: {
     color: colors.text,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "600",
-    marginBottom: 8,
+    marginBottom: 14,
   },
   errorText: {
     color: colors.danger,
@@ -891,19 +811,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     color: colors.text,
-    fontSize: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 16,
+    fontSize: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 20,
   },
   formTextArea: {
     textAlignVertical: "top",
-    minHeight: 120,
+    minHeight: 160,
   },
   modeSwitch: {
     flexDirection: "row",
     gap: 8,
-    marginBottom: 10,
+    marginBottom: 14,
   },
   modeChip: {
     borderRadius: 999,
@@ -928,11 +848,11 @@ const styles = StyleSheet.create({
   previewCard: {
     paddingHorizontal: 0,
     paddingVertical: 0,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   formDescriptionInput: {
     textAlignVertical: "top",
-    minHeight: 84,
+    minHeight: 120,
   },
   modalActions: {
     flexDirection: "row",
