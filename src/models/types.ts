@@ -1,5 +1,5 @@
-export type MemberRole = 'member' | 'leader' | 'admin';
-export type AccessRequestStatus = 'pending' | 'approved' | 'rejected';
+export type MemberRole = "member" | "leader" | "admin";
+export type AccessRequestStatus = "pending" | "approved" | "rejected";
 
 export type UserProfile = {
   uid: string;
@@ -62,7 +62,30 @@ export type StudyFrontmatter = {
 };
 
 export type Study = StudyFrontmatter & {
+  id?: string;
   content: string;
+  updatedAt?: string;
+};
+
+export type StudyReaction = {
+  id: string;
+  userId: string;
+  groupSlug: string;
+  studySlug: string;
+  emoji: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StudyReactionSummary = {
+  counts: Record<string, number>;
+  userEmojis: string[];
+};
+
+export type StudyEngagement = {
+  noteCount: number;
+  reactionCount: number;
+  total: number;
 };
 
 export type MusicItem = {

@@ -81,5 +81,16 @@ service cloud.firestore {
       allow read: if isSignedIn() && (request.auth.uid == resource.data.userId || isAdmin());
       allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
     }
+
+    match /studies/{studyId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /studyReactions/{reactionId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
   }
 }

@@ -104,3 +104,33 @@ export async function fetchNotesByStudy(
 
   return snapshot.docs.map(mapNote);
 }
+
+export async function fetchNotesWithUserInfo(
+  userId: string,
+  groupSlug: string,
+  studySlug: string,
+  includeAll = false,
+) {
+  const { fetchUserProfile } =
+    await import("@/src/services/firebase/firestore");
+
+  const notes = await fetchNotesByStudy(
+    userId,
+    groupSlug,
+    studySlug,
+    includeAll,
+  );
+
+  const notesWithUser = await Promise.all(
+    notes.map(async (note) => {
+      const userProfile = await fetchUserProfile(note.userId);
+      return {
+        ...note,
+        userDisplayName: userProfile?.displayName,
+        userEmail: userProfile?.email,
+      };
+    }),
+  );
+
+  return notesWithUser;
+}

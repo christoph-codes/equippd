@@ -8,7 +8,6 @@ import { Stack, usePathname, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
-import { BrandHeaderTitle } from "@/src/components/brand/BrandLogo";
 import { AuthProvider } from "@/src/context/AuthContext";
 import { useAuth } from "@/src/hooks/useAuth";
 import { colors } from "@/src/theme/colors";
@@ -57,13 +56,13 @@ function RootGuard() {
     <Stack
       screenOptions={{
         headerStyle: { backgroundColor: colors.background },
-        headerTitleAlign: 'left',
+        headerTitleAlign: "left",
         headerTintColor: colors.text,
         contentStyle: { backgroundColor: colors.background },
       }}
     >
-      <Stack.Screen name="login" options={{ headerTitle: () => <BrandHeaderTitle title="Log In" /> }} />
-      <Stack.Screen name="signup" options={{ headerTitle: () => <BrandHeaderTitle title="Sign Up" /> }} />
+      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="signup" options={{ headerShown: false }} />
       <Stack.Screen name="(app)" options={{ headerShown: false }} />
     </Stack>
   );

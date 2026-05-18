@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import Markdown from "react-native-markdown-display";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/src/components/ui/Button";
@@ -58,6 +59,7 @@ export function NoteComposerModal({
 }: Props) {
   const insets = useSafeAreaInsets();
   const [isEditing, setIsEditing] = useState(!startInReadMode && !readOnly);
+  const [previewMode, setPreviewMode] = useState(false);
 
   useEffect(() => {
     if (!visible) {
@@ -65,6 +67,7 @@ export function NoteComposerModal({
     }
 
     setIsEditing(!startInReadMode && !readOnly);
+    setPreviewMode(false);
   }, [visible, startInReadMode, readOnly, sessionKey]);
 
   function enableEditing() {
@@ -103,31 +106,54 @@ export function NoteComposerModal({
 
       <View style={styles.noteBlock}>
         {isEditing ? (
-          <TextInput
-            blurOnSubmit={false}
-            editable={!readOnly}
-            multiline
-            onChangeText={onChangeBody}
-            onKeyPress={(event) => onBodyKeyPress(event.nativeEvent.key)}
-            onSelectionChange={(event) =>
-              onSelectionChange(event.nativeEvent.selection)
-            }
-            placeholder="Start writing..."
-            placeholderTextColor={colors.mutedText}
-            selection={selection}
-            style={styles.bodyInput}
-            textAlignVertical="top"
-            value={body}
-          />
+          <>
+            <View style={styles.modeSwitch}>
+              <Text
+                onPress={() => setPreviewMode(false)}
+                style={[styles.modeChip, !previewMode && styles.modeChipActive]}
+              >
+                Write
+              </Text>
+              <Text
+                onPress={() => setPreviewMode(true)}
+                style={[styles.modeChip, previewMode && styles.modeChipActive]}
+              >
+                Preview
+              </Text>
+            </View>
+
+            {previewMode ? (
+              <ScrollView contentContainerStyle={styles.readBodyContent}>
+                <Markdown style={markdownStyles}>
+                  {body.trim() || "Start writing..."}
+                </Markdown>
+              </ScrollView>
+            ) : (
+              <TextInput
+                blurOnSubmit={false}
+                editable={!readOnly}
+                multiline
+                onChangeText={onChangeBody}
+                onKeyPress={(event) => onBodyKeyPress(event.nativeEvent.key)}
+                onSelectionChange={(event) =>
+                  onSelectionChange(event.nativeEvent.selection)
+                }
+                placeholder="Start writing..."
+                placeholderTextColor={colors.mutedText}
+                selection={selection}
+                style={styles.bodyInput}
+                textAlignVertical="top"
+                value={body}
+              />
+            )}
+          </>
         ) : (
           <ScrollView contentContainerStyle={styles.readBodyContent}>
-            <Text
-              onPress={enableEditing}
-              selectable
-              style={styles.bodyReadText}
-            >
-              {body.trim() || "Start writing..."}
-            </Text>
+            <View onTouchEnd={enableEditing}>
+              <Markdown style={markdownStyles}>
+                {body.trim() || "Start writing..."}
+              </Markdown>
+            </View>
           </ScrollView>
         )}
       </View>
@@ -193,6 +219,27 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 2,
   },
+  modeSwitch: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 10,
+  },
+  modeChip: {
+    color: colors.mutedText,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  modeChipActive: {
+    color: colors.accentText,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
   titleInput: {
     minHeight: 56,
     color: colors.text,
@@ -225,11 +272,6 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 12,
   },
-  bodyReadText: {
-    color: colors.text,
-    fontSize: 17,
-    lineHeight: 22,
-  },
   sheetActions: {
     flexDirection: "row",
     gap: 10,
@@ -240,5 +282,89 @@ const styles = StyleSheet.create({
   error: {
     color: colors.danger,
     lineHeight: 20,
+  },
+});
+
+const markdownStyles = StyleSheet.create({
+  body: {
+    color: colors.text,
+    fontSize: 16,
+    lineHeight: 26,
+  },
+  paragraph: {
+    color: colors.text,
+    fontSize: 16,
+    lineHeight: 26,
+    marginTop: 0,
+    marginBottom: 14,
+  },
+  heading1: {
+    color: colors.text,
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: "800",
+    marginTop: 18,
+    marginBottom: 14,
+  },
+  heading2: {
+    color: colors.text,
+    fontSize: 24,
+    lineHeight: 30,
+    fontWeight: "800",
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  heading3: {
+    color: colors.text,
+    fontSize: 20,
+    lineHeight: 26,
+    fontWeight: "700",
+    marginTop: 14,
+    marginBottom: 10,
+  },
+  bullet_list: {
+    color: colors.text,
+    marginBottom: 14,
+  },
+  ordered_list: {
+    color: colors.text,
+    marginBottom: 14,
+  },
+  list_item: {
+    color: colors.text,
+    lineHeight: 26,
+    marginBottom: 6,
+  },
+  blockquote: {
+    borderLeftWidth: 3,
+    borderLeftColor: colors.border,
+    paddingLeft: 12,
+    marginVertical: 12,
+  },
+  code_inline: {
+    color: colors.text,
+    backgroundColor: colors.surface,
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  code_block: {
+    color: colors.text,
+    backgroundColor: colors.surface,
+    borderRadius: 8,
+    padding: 12,
+    marginVertical: 12,
+  },
+  hr: {
+    backgroundColor: colors.border,
+    height: 1,
+    marginVertical: 14,
+  },
+  strong: {
+    color: colors.text,
+    fontWeight: "800",
+  },
+  em: {
+    color: colors.text,
   },
 });
