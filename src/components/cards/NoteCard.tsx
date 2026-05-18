@@ -18,7 +18,7 @@ export function NoteCard({ note, onPress, userDisplayName }: Props) {
   }).format(new Date(note.updatedAt));
   const bodyPreview =
     note.body.replace(/[#>*_`-]/g, "").trim() || "No body yet";
-  
+
   const userInitials = (userDisplayName || "U")
     .split(" ")
     .slice(0, 2)

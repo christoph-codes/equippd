@@ -12,12 +12,12 @@ import {
 } from "react-native";
 import Markdown from "react-native-markdown-display";
 
+import { NoteCard } from "@/src/components/cards/NoteCard";
 import { Button } from "@/src/components/ui/Button";
 import { EmptyState } from "@/src/components/ui/EmptyState";
 import { Modal } from "@/src/components/ui/Modal";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
-import { NoteCard } from "@/src/components/cards/NoteCard";
 import { useAuth } from "@/src/hooks/useAuth";
 import { Note, Study } from "@/src/models/types";
 import {
