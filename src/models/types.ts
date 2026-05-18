@@ -64,6 +64,7 @@ export type StudyFrontmatter = {
 export type Study = StudyFrontmatter & {
   id?: string;
   content: string;
+  createdAt?: string;
   updatedAt?: string;
 };
 

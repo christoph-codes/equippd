@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Card } from "@/src/components/ui/Card";
 import { Note } from "@/src/models/types";
+import { formatDate } from "@/src/services/utils/helpers";
 import { colors } from "@/src/theme/colors";
 
 type Props = {
@@ -38,8 +39,8 @@ export function NoteCard({ note, onPress, userDisplayName }: Props) {
               <Text numberOfLines={1} style={styles.author}>
                 {userDisplayName}
               </Text>
-              <Text numberOfLines={2} style={styles.title}>
-                {note.title || "Untitled note"}
+              <Text numberOfLines={2} style={styles.date}>
+                {formatDate(note.updatedAt)}
               </Text>
             </View>
           </View>
@@ -48,7 +49,7 @@ export function NoteCard({ note, onPress, userDisplayName }: Props) {
             <Text numberOfLines={2} style={styles.title}>
               {note.title || "Untitled note"}
             </Text>
-            <Text style={styles.date}>{updatedAt}</Text>
+            <Text style={styles.date}>{formatDate(note.updatedAt)}</Text>
           </View>
         )}
         <Text numberOfLines={3} style={styles.body}>

@@ -186,8 +186,9 @@ function mapStudy(snapshot: QueryDocumentSnapshot<DocumentData>): Study {
     tags: Array.isArray(data.tags) ? data.tags : [],
     author: data.author,
     content: data.content,
+    createdAt: formatTimestamp(data.createdAt),
     updatedAt: formatTimestamp(data.updatedAt),
-  };
+  } satisfies Study;
 }
 
 export async function saveStudy(study: Omit<Study, "id"> & { id?: string }) {

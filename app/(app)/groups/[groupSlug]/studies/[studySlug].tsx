@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Pressable,
@@ -80,6 +80,27 @@ export default function StudyDetailScreen() {
       setStudyLoading(false);
     });
   }, [groupSlug, studySlug]);
+
+  const navigation = useNavigation();
+  useEffect(() => {
+    if (study) {
+      navigation.setOptions({
+        headerTitle: () => (
+          <View pointerEvents="none" style={styles.headerTitleRow}>
+            <Text numberOfLines={1} style={styles.headerStudyTitle}>
+              {study.title}
+            </Text>
+          </View>
+        ),
+        headerBackVisible: true,
+        headerRight: () => null,
+        headerTitleContainerStyle: {
+          left: 56,
+          right: 16,
+        },
+      });
+    }
+  }, [study, navigation]);
 
   useEffect(() => {
     if (!groupSlug || !user) {
@@ -278,6 +299,16 @@ export default function StudyDetailScreen() {
     );
   }
 
+  const createdAt = (date?: string) => {
+    console.log("date", date);
+    if (!date) return "";
+    return new Intl.DateTimeFormat(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(new Date(date));
+  };
+
   if (!study) {
     return (
       <ScreenContainer>
@@ -292,12 +323,9 @@ export default function StudyDetailScreen() {
   return (
     <View style={styles.container}>
       <ScreenContainer>
-        <View style={styles.studyHeaderRow}>
-          <Text style={styles.studyTitle}>{study.title}</Text>
-        </View>
         <Text
           style={styles.studyMeta}
-        >{`${study.scripture} • ${study.author}`}</Text>
+        >{`${study.scripture} • ${createdAt(study.createdAt)}`}</Text>
         <Markdown style={markdownStyles}>{study.content}</Markdown>
 
         <SectionHeader title="React to this study" />
@@ -670,6 +698,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
     marginBottom: 12,
+  },
+  headerStudyTitle: {
+    color: colors.text,
+    fontSize: 21,
+    fontWeight: "800",
+    width: "100%",
+    flexShrink: 1,
+    textAlign: "right",
+  },
+  headerTitleRow: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingRight: 16,
   },
   floatingEditButton: {
     position: "absolute",

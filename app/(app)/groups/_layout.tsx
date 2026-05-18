@@ -35,7 +35,14 @@ export default function GroupsLayout() {
       />
       <Stack.Screen
         name="[groupSlug]/studies/[studySlug]"
-        options={{ headerTitle: () => <BrandHeaderTitle title="Study" /> }}
+        options={{
+          headerTitle: "Study",
+          headerTitleStyle: {
+            color: colors.text,
+            fontSize: 19,
+            fontWeight: "800",
+          },
+        }}
       />
     </Stack>
   );
