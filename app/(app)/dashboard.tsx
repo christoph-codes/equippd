@@ -14,12 +14,12 @@ import { ScreenIntro } from "@/src/components/ui/ScreenIntro";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { useAuth } from "@/src/hooks/useAuth";
 import { Group, Note } from "@/src/models/types";
-import { loadMusicItems } from "@/src/services/content/mdx";
+import { getMusicItemCount } from "@/src/services/content/mdx";
 import { fetchAccessibleGroups } from "@/src/services/firebase/groups";
 import { fetchRecentNotes } from "@/src/services/firebase/notes";
 import { colors } from "@/src/theme/colors";
 
-const featuredMusicCount = loadMusicItems().length;
+const featuredMusicCount = getMusicItemCount();
 
 const quickLinks = [
   {

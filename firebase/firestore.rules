@@ -92,5 +92,14 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
       allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
     }
+
+    match /songs/{songId} {
+      allow read: if isSignedIn() && (resource.data.status == 'approved' || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.submittedBy && (request.resource.data.status == 'pending' || (isAdmin() && request.resource.data.status == 'approved'));
+      allow update: if isAdmin() && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['submittedBy', 'submittedByDisplayName', 'createdAt'])
+      );
+      allow delete: if isAdmin();
+    }
   }
 }

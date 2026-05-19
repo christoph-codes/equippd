@@ -90,9 +90,18 @@ export type StudyEngagement = {
   total: number;
 };
 
-export type MusicItem = {
+export type SongStatus = "pending" | "approved" | "rejected";
+
+export type Song = {
+  id: string;
   title: string;
   artist: string;
-  description: string;
-  link: string;
+  submittedBy: string;
+  submittedByDisplayName: string;
+  submittedByPhotoURL?: string;
+  status: SongStatus;
+  spotifyUrl?: string;
+  appleMusicUrl?: string;
+  createdAt: string;
+  updatedAt: string;
 };

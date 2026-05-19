@@ -8,6 +8,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  getDocsFromServer,
   query,
   serverTimestamp,
   setDoc,
@@ -18,6 +19,7 @@ import {
 import {
   Group,
   Note,
+  Song,
   Study,
   StudyEngagement,
   StudyReaction,
@@ -365,4 +367,166 @@ export async function fetchStudyEngagementByGroup(
   }
 
   return engagement;
+}
+
+function mapSong(snapshot: QueryDocumentSnapshot<DocumentData>): Song {
+  const data = snapshot.data();
+  return {
+    id: snapshot.id,
+    title: data.title,
+    artist: data.artist,
+    submittedBy: data.submittedBy,
+    submittedByDisplayName: data.submittedByDisplayName,
+    submittedByPhotoURL: data.submittedByPhotoURL ?? undefined,
+    status: data.status,
+    spotifyUrl: data.spotifyUrl ?? undefined,
+    appleMusicUrl: data.appleMusicUrl ?? undefined,
+    createdAt: formatTimestamp(data.createdAt),
+    updatedAt: formatTimestamp(data.updatedAt),
+  };
+}
+
+async function fetchSongsByStatus(
+  status: "approved" | "pending",
+): Promise<Song[]> {
+  const dbClient = requireDb();
+  const songsQuery = query(
+    collection(dbClient, "songs"),
+    where("status", "==", status),
+  );
+
+  const snapshot = await (async () => {
+    try {
+      return await getDocsFromServer(songsQuery);
+    } catch {
+      return getDocs(songsQuery);
+    }
+  })();
+
+  const songs = snapshot.docs
+    .map(mapSong)
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
+  const submitterIds = Array.from(
+    new Set(
+      songs
+        .filter(
+          (song) => !song.submittedByPhotoURL || !song.submittedByDisplayName,
+        )
+        .map((song) => song.submittedBy),
+    ),
+  );
+
+  if (submitterIds.length === 0) {
+    return songs;
+  }
+
+  const submitterProfiles = new Map<
+    string,
+    { displayName?: string; photoURL?: string | null }
+  >();
+
+  await Promise.all(
+    submitterIds.map(async (submitterId) => {
+      const userSnapshot = await getDoc(doc(dbClient, "users", submitterId));
+      if (!userSnapshot.exists()) {
+        return;
+      }
+
+      const userData = userSnapshot.data();
+      submitterProfiles.set(submitterId, {
+        displayName:
+          typeof userData.displayName === "string"
+            ? userData.displayName
+            : undefined,
+        photoURL:
+          typeof userData.photoURL === "string" ? userData.photoURL : null,
+      });
+    }),
+  );
+
+  return songs.map((song) => {
+    const profile = submitterProfiles.get(song.submittedBy);
+    if (!profile) {
+      return song;
+    }
+
+    return {
+      ...song,
+      submittedByDisplayName:
+        song.submittedByDisplayName || profile.displayName || "Unknown user",
+      submittedByPhotoURL:
+        song.submittedByPhotoURL || profile.photoURL || undefined,
+    };
+  });
+}
+
+export async function submitSong(
+  userId: string,
+  userDisplayName: string,
+  title: string,
+  artist: string,
+  spotifyUrl?: string,
+  appleMusicUrl?: string,
+  isAdmin: boolean = false,
+  userPhotoURL?: string,
+) {
+  const dbClient = requireDb();
+  await addDoc(collection(dbClient, "songs"), {
+    title,
+    artist,
+    submittedBy: userId,
+    submittedByDisplayName: userDisplayName,
+    submittedByPhotoURL: userPhotoURL ?? null,
+    status: isAdmin ? "approved" : "pending",
+    spotifyUrl: spotifyUrl ?? null,
+    appleMusicUrl: appleMusicUrl ?? null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function fetchApprovedSongs(): Promise<Song[]> {
+  return fetchSongsByStatus("approved");
+}
+
+export async function fetchPendingSongs(): Promise<Song[]> {
+  return fetchSongsByStatus("pending");
+}
+
+export async function approveSong(songId: string) {
+  const dbClient = requireDb();
+  await updateDoc(doc(dbClient, "songs", songId), {
+    status: "approved",
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function rejectSong(songId: string) {
+  const dbClient = requireDb();
+  await updateDoc(doc(dbClient, "songs", songId), {
+    status: "rejected",
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateSongLinks(
+  songId: string,
+  spotifyUrl?: string,
+  appleMusicUrl?: string,
+) {
+  const dbClient = requireDb();
+  await updateDoc(doc(dbClient, "songs", songId), {
+    spotifyUrl: spotifyUrl ? spotifyUrl.trim() : null,
+    appleMusicUrl: appleMusicUrl ? appleMusicUrl.trim() : null,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteSong(songId: string) {
+  const dbClient = requireDb();
+  await deleteDoc(doc(dbClient, "songs", songId));
 }

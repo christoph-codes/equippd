@@ -1,6 +1,3 @@
-import matter from "gray-matter";
-
-import { MusicItem } from "@/src/models/types";
 import { musicMdxContent } from "@/src/services/content/registry";
 
 type RawDoc = {
@@ -8,16 +5,13 @@ type RawDoc = {
   source: string;
 };
 
-export function loadMusicItems(): MusicItem[] {
-  return musicMdxContent.map((doc) => {
-    const parsed = matter(doc.source);
-    return {
-      title: String(parsed.data.title ?? ""),
-      artist: String(parsed.data.artist ?? ""),
-      description: String(parsed.data.description ?? "").trim(),
-      link: String(parsed.data.link ?? "#"),
-    };
-  });
+/**
+ * Returns the count of music items from static content.
+ * Note: In React Native/Expo, gray-matter parsing doesn't work due to Buffer requirements.
+ * This is now deprecated in favor of Firebase-based music management.
+ */
+export function getMusicItemCount(): number {
+  return musicMdxContent.length;
 }
 
 export function listContentPaths() {
