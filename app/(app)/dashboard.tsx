@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { GroupCard } from "@/src/components/cards/GroupCard";
 import { NoteCard } from "@/src/components/cards/NoteCard";
@@ -84,33 +84,55 @@ export default function DashboardScreen() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
+  const loadDashboard = useCallback(async () => {
     if (!user) {
       setGroups([]);
       setRecentNotes([]);
       return;
     }
 
-    setLoading(true);
-    void Promise.all([
+    const [nextGroups, nextNotes] = await Promise.all([
       fetchAccessibleGroups(user.uid, isAdmin),
       fetchRecentNotes(user.uid, 3, isAdmin),
-    ])
-      .then(([nextGroups, nextNotes]) => {
-        setGroups(nextGroups);
-        setRecentNotes(nextNotes);
-      })
+    ]);
+
+    setGroups(nextGroups);
+    setRecentNotes(nextNotes);
+  }, [isAdmin, user]);
+
+  useEffect(() => {
+    setLoading(true);
+    void loadDashboard()
       .catch(() => {
         setGroups([]);
         setRecentNotes([]);
       })
       .finally(() => setLoading(false));
-  }, [isAdmin, user]);
+  }, [loadDashboard]);
+
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await loadDashboard();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [loadDashboard]);
 
   return (
     <View style={styles.screen}>
-      <ScreenContainer>
+      <ScreenContainer
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+          />
+        }
+      >
         <ScreenIntro>
           {`Welcome, ${user?.displayName || "Equippd Member"}!`}
         </ScreenIntro>

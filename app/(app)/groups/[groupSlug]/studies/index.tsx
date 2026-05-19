@@ -1,5 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { RefreshControl } from "react-native";
 
 import { StudyCard } from "@/src/components/cards/StudyCard";
 import { Button } from "@/src/components/ui/Button";
@@ -14,6 +15,7 @@ import {
   fetchStudyEngagementByGroup,
 } from "@/src/services/firebase/firestore";
 import { canAccessGroup } from "@/src/services/firebase/groups";
+import { colors } from "@/src/theme/colors";
 
 export default function GroupStudiesScreen() {
   const router = useRouter();
@@ -22,35 +24,61 @@ export default function GroupStudiesScreen() {
   const [hasAccess, setHasAccess] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
   const [studies, setStudies] = useState<Study[]>([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [engagementByStudy, setEngagementByStudy] = useState<
     Record<string, StudyEngagement>
   >({});
 
-  useEffect(() => {
+  const checkAccess = useCallback(async () => {
     if (!groupSlug || !user) {
       return;
     }
 
     setAccessChecked(false);
-    void canAccessGroup(user.uid, groupSlug, isAdmin).then((nextHasAccess) => {
-      setHasAccess(nextHasAccess);
-      setAccessChecked(true);
-    });
+    const nextHasAccess = await canAccessGroup(user.uid, groupSlug, isAdmin);
+    setHasAccess(nextHasAccess);
+    setAccessChecked(true);
   }, [groupSlug, isAdmin, user]);
 
-  useEffect(() => {
-    if (!groupSlug) return;
-    void fetchStudiesByGroup(groupSlug).then(setStudies);
+  const loadStudies = useCallback(async () => {
+    if (!groupSlug) {
+      return;
+    }
+
+    const nextStudies = await fetchStudiesByGroup(groupSlug);
+    setStudies(nextStudies);
   }, [groupSlug]);
 
-  useEffect(() => {
+  const loadEngagement = useCallback(async () => {
     if (!groupSlug) {
       setEngagementByStudy({});
       return;
     }
 
-    void fetchStudyEngagementByGroup(groupSlug).then(setEngagementByStudy);
+    const nextEngagement = await fetchStudyEngagementByGroup(groupSlug);
+    setEngagementByStudy(nextEngagement);
   }, [groupSlug]);
+
+  useEffect(() => {
+    void checkAccess();
+  }, [checkAccess]);
+
+  useEffect(() => {
+    void loadStudies();
+  }, [loadStudies]);
+
+  useEffect(() => {
+    void loadEngagement();
+  }, [loadEngagement]);
+
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([checkAccess(), loadStudies(), loadEngagement()]);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [checkAccess, loadEngagement, loadStudies]);
 
   const sortedStudies = [...studies].sort((a, b) => {
     const aTotal = engagementByStudy[a.slug]?.total ?? 0;
@@ -83,7 +111,16 @@ export default function GroupStudiesScreen() {
   }
 
   return (
-    <ScreenContainer>
+    <ScreenContainer
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.accent}
+          colors={[colors.accent]}
+        />
+      }
+    >
       <SectionHeader title="Studies" subtitle={`Group: ${groupSlug}`} />
       {sortedStudies.length ? (
         sortedStudies.map((study) => (

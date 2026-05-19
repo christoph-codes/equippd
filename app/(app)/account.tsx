@@ -2,8 +2,8 @@ import Constants from "expo-constants";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { Alert, RefreshControl, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
@@ -82,6 +82,7 @@ export default function AccountScreen() {
   const [nextPassword, setNextPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const appVersion = Constants.expoConfig?.version ?? "-";
   const currentYear = new Date().getFullYear();
 
@@ -239,8 +240,26 @@ export default function AccountScreen() {
     router.replace("/login");
   }
 
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await withTimeout(refreshProfile(), PROFILE_REFRESH_TIMEOUT_MS);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refreshProfile]);
+
   return (
-    <ScreenContainer>
+    <ScreenContainer
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.accent}
+          colors={[colors.accent]}
+        />
+      }
+    >
       <SectionHeader
         title="Account"
         subtitle="Manage your profile, credentials, and session."

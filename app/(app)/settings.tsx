@@ -1,4 +1,6 @@
 import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { RefreshControl } from "react-native";
 
 import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
@@ -8,18 +10,38 @@ import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { useAuth } from "@/src/hooks/useAuth";
 import { listContentPaths } from "@/src/services/content/mdx";
 import { isFirebaseConfigured } from "@/src/services/firebase/config";
+import { colors } from "@/src/theme/colors";
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { signOut } = useAuth();
+  const { refreshProfile, signOut } = useAuth();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   async function onLogout() {
     await signOut();
     router.replace("/login");
   }
 
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshProfile();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refreshProfile]);
+
   return (
-    <ScreenContainer>
+    <ScreenContainer
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.accent}
+          colors={[colors.accent]}
+        />
+      }
+    >
       <PageHeader
         title="Settings"
         subtitle="App configuration and account shortcuts."

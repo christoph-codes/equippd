@@ -20,7 +20,6 @@ import {
   Alert,
   Pressable,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -64,14 +63,14 @@ export default function MusicScreen() {
 
   // Initial load only on mount
   useEffect(() => {
-    loadSongs(true);
-  }, []);
+    void loadSongs(true);
+  }, [loadSongs]);
 
   // Refresh data when screen comes into focus (silent refresh, no loading indicator)
   useFocusEffect(
     useCallback(() => {
-      loadSongs(false);
-    }, [user]),
+      void loadSongs(false);
+    }, [loadSongs]),
   );
 
   const handleSubmitSong = async (
@@ -133,51 +132,47 @@ export default function MusicScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenContainer>
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={handlePullToRefresh}
-              tintColor={colors.accent}
-              colors={[colors.accent]}
-            />
-          }
-        >
-          {isInitialLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.accent} />
-            </View>
-          ) : approvedSongs.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No approved songs yet</Text>
-              <Text style={styles.emptySubtext}>
-                Be the first to submit a song!
+      <ScreenContainer
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handlePullToRefresh}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+          />
+        }
+      >
+        {isInitialLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.accent} />
+          </View>
+        ) : approvedSongs.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No approved songs yet</Text>
+            <Text style={styles.emptySubtext}>
+              Be the first to submit a song!
+            </Text>
+          </View>
+        ) : (
+          <View>
+            {isAdmin && (
+              <Text style={styles.sectionTitle}>
+                Approved Songs ({approvedSongs.length})
               </Text>
-            </View>
-          ) : (
-            <View>
-              {isAdmin && (
-                <Text style={styles.sectionTitle}>
-                  Approved Songs ({approvedSongs.length})
-                </Text>
-              )}
-              {approvedSongs.map((song) => (
-                <SongCard key={song.id} song={song} />
-              ))}
-            </View>
-          )}
+            )}
+            {approvedSongs.map((song) => (
+              <SongCard key={song.id} song={song} />
+            ))}
+          </View>
+        )}
 
-          {isAdmin && (
-            <AdminSongManagement
-              pendingSongs={pendingSongs}
-              isLoading={isInitialLoading}
-              onRefresh={() => loadSongs(false)}
-            />
-          )}
-        </ScrollView>
+        {isAdmin && (
+          <AdminSongManagement
+            pendingSongs={pendingSongs}
+            isLoading={isInitialLoading}
+            onRefresh={() => loadSongs(false)}
+          />
+        )}
       </ScreenContainer>
 
       <Pressable
