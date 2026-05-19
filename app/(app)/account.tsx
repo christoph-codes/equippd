@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -57,6 +58,8 @@ export default function AccountScreen() {
   const [nextPassword, setNextPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const appVersion = Constants.expoConfig?.version ?? "-";
+  const currentYear = new Date().getFullYear();
 
   const activePhotoURL = profile?.photoURL || user?.photoURL || null;
   const initials = useMemo(() => {
@@ -113,7 +116,7 @@ export default function AccountScreen() {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType.Images,
     });
 
     if (result.canceled || !result.assets?.[0]?.uri) {
@@ -323,6 +326,13 @@ export default function AccountScreen() {
 
       <Button label="Log out" variant="danger" onPress={onLogout} />
 
+      <View style={styles.footer}>
+        <Text
+          style={styles.footerText}
+        >{`Equippd © ${currentYear}. All Rights Reserved.`}</Text>
+        <Text style={styles.footerText}>{`Version ${appVersion}`}</Text>
+      </View>
+
       <LoadingOverlay visible={savingPhoto || savingName} />
     </ScreenContainer>
   );
@@ -375,5 +385,17 @@ const styles = StyleSheet.create({
   error: {
     color: colors.danger,
     fontWeight: "600",
+  },
+  footer: {
+    marginTop: 4,
+    paddingTop: 2,
+    paddingBottom: 6,
+    alignItems: "center",
+    gap: 2,
+  },
+  footerText: {
+    color: colors.mutedText,
+    fontSize: 12,
+    textAlign: "center",
   },
 });
