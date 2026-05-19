@@ -14,6 +14,8 @@ import {
   logout,
   signup,
   subscribeToAuth,
+  updateAccountPassword,
+  updateAccountProfile,
 } from "@/src/services/firebase/auth";
 import {
   fetchUserProfile,
@@ -32,6 +34,15 @@ type AuthContextValue = {
     password: string,
   ) => Promise<void>;
   signOut: () => Promise<void>;
+  updateProfile: (
+    displayName: string,
+    photoURL?: string | null,
+  ) => Promise<void>;
+  updatePassword: (
+    currentPassword: string,
+    nextPassword: string,
+  ) => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -42,29 +53,32 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  async function hydrateUserState(nextUser: User | null) {
+    setUser(nextUser);
+    setProfile(null);
+    setIsAdmin(false);
+
+    if (!nextUser) {
+      return;
+    }
+
+    const [nextProfile, tokenResult] = await Promise.all([
+      fetchUserProfile(nextUser.uid).catch(() => null),
+      getIdTokenResult(nextUser).catch(() => null),
+    ]);
+
+    setProfile(nextProfile);
+    setIsAdmin(
+      tokenResult?.claims.admin === true ||
+        tokenResult?.claims.role === "admin" ||
+        nextProfile?.role === "admin",
+    );
+  }
+
   useEffect(() => {
     const unsubscribe = subscribeToAuth(async (nextUser) => {
       setLoading(true);
-      setUser(nextUser);
-      setProfile(null);
-      setIsAdmin(false);
-
-      if (!nextUser) {
-        setLoading(false);
-        return;
-      }
-
-      const [nextProfile, tokenResult] = await Promise.all([
-        fetchUserProfile(nextUser.uid).catch(() => null),
-        getIdTokenResult(nextUser).catch(() => null),
-      ]);
-
-      setProfile(nextProfile);
-      setIsAdmin(
-        tokenResult?.claims.admin === true ||
-          tokenResult?.claims.role === "admin" ||
-          nextProfile?.role === "admin",
-      );
+      await hydrateUserState(nextUser);
       setLoading(false);
     });
 
@@ -86,10 +100,31 @@ export function AuthProvider({ children }: PropsWithChildren) {
           uid: credential.user.uid,
           displayName,
           email,
+          photoURL: credential.user.photoURL,
         });
       },
       signOut: async () => {
         await logout();
+      },
+      updateProfile: async (displayName, photoURL) => {
+        if (!user) {
+          throw new Error("You must be logged in to manage your profile.");
+        }
+
+        await updateAccountProfile(displayName, photoURL);
+        await upsertUserProfile({
+          uid: user.uid,
+          email: user.email ?? profile?.email ?? "",
+          displayName,
+          photoURL,
+        });
+        await hydrateUserState(user);
+      },
+      updatePassword: async (currentPassword, nextPassword) => {
+        await updateAccountPassword(currentPassword, nextPassword);
+      },
+      refreshProfile: async () => {
+        await hydrateUserState(user);
       },
     }),
     [isAdmin, loading, profile, user],

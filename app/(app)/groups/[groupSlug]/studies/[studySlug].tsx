@@ -2,30 +2,31 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+	Pressable,
+	RefreshControl,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
 } from "react-native";
 import Markdown from "react-native-markdown-display";
 
 import { NoteCard } from "@/src/components/cards/NoteCard";
 import { Button } from "@/src/components/ui/Button";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { LoadingOverlay } from "@/src/components/ui/LoadingOverlay";
 import { Modal } from "@/src/components/ui/Modal";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { useAuth } from "@/src/hooks/useAuth";
 import { Note, Study } from "@/src/models/types";
 import {
-  fetchStudyBySlug,
-  fetchStudyReactionSummary,
-  saveNote,
-  saveStudy,
-  toggleStudyReaction,
+	fetchStudyBySlug,
+	fetchStudyReactionSummary,
+	saveNote,
+	saveStudy,
+	toggleStudyReaction,
 } from "@/src/services/firebase/firestore";
 import { canAccessGroup } from "@/src/services/firebase/groups";
 import { fetchNotesWithUserInfo } from "@/src/services/firebase/notes";
@@ -274,7 +275,7 @@ export default function StudyDetailScreen() {
   };
 
   if (!accessChecked || studyLoading) {
-    return null;
+    return <LoadingOverlay visible fullScreen />;
   }
 
   if (accessChecked && !hasAccess) {
@@ -300,7 +301,6 @@ export default function StudyDetailScreen() {
   }
 
   const createdAt = (date?: string) => {
-    console.log("date", date);
     if (!date) return "";
     return new Intl.DateTimeFormat(undefined, {
       month: "short",

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { StudyCard } from "@/src/components/cards/StudyCard";
 import { Button } from "@/src/components/ui/Button";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { LoadingOverlay } from "@/src/components/ui/LoadingOverlay";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -61,6 +62,10 @@ export default function GroupStudiesScreen() {
   });
 
   const topStudySlug = sortedStudies[0]?.slug;
+
+  if (!accessChecked) {
+    return <LoadingOverlay visible fullScreen />;
+  }
 
   if (accessChecked && !hasAccess) {
     return (

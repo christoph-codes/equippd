@@ -29,6 +29,7 @@ This repository now contains the Equippd mobile app foundation built with **Expo
 - `/(app)/groups/[groupSlug]/studies/[studySlug]`
 - `/(app)/notes/[noteId]`
 - `/(app)/music`
+- `/(app)/account`
 - `/(app)/shop`
 - `/(app)/settings`
 
@@ -63,6 +64,8 @@ EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1
 EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_PORT=9099
 EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_HOST=127.0.0.1
 EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_PORT=8080
+EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_HOST=127.0.0.1
+EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_PORT=9199
 ```
 
 Firestore rules draft is in:
@@ -76,7 +79,7 @@ To avoid editing cloud Firebase records while developing, this app automatically
 Start the emulators:
 
 ```bash
-npx firebase-tools emulators:start --only auth,firestore
+npx firebase-tools emulators:start --only auth,firestore,storage
 ```
 
 Then run the app:

@@ -2,17 +2,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
-	Pressable,
-	RefreshControl,
-	StyleSheet,
-	Text,
-	View,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 import { NoteCard } from "@/src/components/cards/NoteCard";
 import { NoteComposerModal } from "@/src/components/notes/NoteComposerModal";
 import { Button } from "@/src/components/ui/Button";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { LoadingOverlay } from "@/src/components/ui/LoadingOverlay";
 import { Modal } from "@/src/components/ui/Modal";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { ScreenIntro } from "@/src/components/ui/ScreenIntro";
@@ -263,10 +264,6 @@ export default function NotesScreen() {
           />
         }
       >
-        {latestUpdatedLabel ? (
-          <Text style={styles.latestUpdated}>{latestUpdatedLabel}</Text>
-        ) : null}
-
         <ScreenIntro>
           {isAdmin
             ? "Review and manage notes across Equippd."
@@ -357,6 +354,7 @@ export default function NotesScreen() {
           </View>
         </View>
       </Modal>
+      <LoadingOverlay visible={loading} />
     </View>
   );
 }

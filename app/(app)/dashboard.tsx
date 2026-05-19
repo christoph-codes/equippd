@@ -4,8 +4,8 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { GroupCard } from "@/src/components/cards/GroupCard";
 import { Button } from "@/src/components/ui/Button";
-import { Card } from "@/src/components/ui/Card";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { LoadingOverlay } from "@/src/components/ui/LoadingOverlay";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { ScreenIntro } from "@/src/components/ui/ScreenIntro";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -17,67 +17,68 @@ export default function DashboardScreen() {
   const router = useRouter();
   const { isAdmin, user } = useAuth();
   const [groups, setGroups] = useState<Group[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
       return;
     }
 
+    setLoading(true);
     void fetchAccessibleGroups(user.uid, isAdmin)
       .then((nextGroups) => {
         setGroups(nextGroups);
       })
       .catch(() => {
         setGroups([]);
-      });
+      })
+      .finally(() => setLoading(false));
   }, [isAdmin, user]);
 
   return (
-    <ScreenContainer>
-      <ScreenIntro>
-        {`Welcome, ${user?.displayName || "Equippd Member"}!`}
-      </ScreenIntro>
+    <View style={styles.screen}>
+      <ScreenContainer>
+        <ScreenIntro>
+          {`Welcome, ${user?.displayName || "Equippd Member"}!`}
+        </ScreenIntro>
 
-      {groups.length ? (
-        <Card>
-          <View style={styles.row}>
-            <View style={styles.copy}>
-              <Text style={styles.title}>
-                {isAdmin ? "Group overview" : "Your groups"}
-              </Text>
-              <Text style={styles.description}>
-                {isAdmin
-                  ? `${groups.length} group${groups.length === 1 ? "" : "s"} available across Equippd.`
-                  : `You're connected to ${groups.length} group${groups.length === 1 ? "" : "s"}.`}
-              </Text>
+        {groups.length ? (
+          <>
+            <View style={styles.row}>
+              <View style={styles.copy}>
+                <Text style={styles.title}>Groups</Text>
+              </View>
             </View>
-            <Button label="Open" onPress={() => router.push("/(app)/groups")} />
-          </View>
-          {groups.slice(0, 2).map((group) => (
-            <GroupCard
-              key={group.id}
-              group={group}
-              onPress={() => router.push(`/(app)/groups/${group.slug}`)}
+            {groups.slice(0, 2).map((group) => (
+              <GroupCard
+                key={group.id}
+                group={group}
+                onPress={() => router.push(`/(app)/groups/${group.slug}`)}
+              />
+            ))}
+          </>
+        ) : (
+          <>
+            <EmptyState
+              title="No groups yet"
+              description="Explore available groups and request access from an admin."
             />
-          ))}
-        </Card>
-      ) : (
-        <>
-          <EmptyState
-            title="No groups yet"
-            description="Explore available groups and request access from an admin."
-          />
-          <Button
-            label="Explore groups"
-            onPress={() => router.push("/(app)/groups")}
-          />
-        </>
-      )}
-    </ScreenContainer>
+          </>
+        )}
+        <Button
+          label="Explore groups"
+          onPress={() => router.push("/(app)/groups")}
+        />
+      </ScreenContainer>
+      <LoadingOverlay visible={loading} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   row: {
     gap: 12,
   },
@@ -86,8 +87,8 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 21,
+    fontWeight: "800",
   },
   description: {
     color: colors.mutedText,

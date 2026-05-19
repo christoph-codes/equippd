@@ -6,8 +6,8 @@ if (typeof global.Buffer === "undefined") {
 
 import { Stack, usePathname, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
 
+import { LoadingOverlay } from "@/src/components/ui/LoadingOverlay";
 import { AuthProvider } from "@/src/context/AuthContext";
 import { useAuth } from "@/src/hooks/useAuth";
 import { colors } from "@/src/theme/colors";
@@ -28,6 +28,7 @@ function RootGuard() {
       pathname.startsWith("/notes") ||
       pathname.startsWith("/music") ||
       pathname.startsWith("/shop") ||
+      pathname.startsWith("/account") ||
       pathname.startsWith("/settings") ||
       pathname.startsWith("/(app)");
 
@@ -45,11 +46,7 @@ function RootGuard() {
   }, [loading, pathname, router, user]);
 
   if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator color={colors.accent} />
-      </View>
-    );
+    return <LoadingOverlay visible fullScreen />;
   }
 
   return (
@@ -75,12 +72,3 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.background,
-  },
-});

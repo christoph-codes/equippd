@@ -7,6 +7,11 @@ import {
   connectFirestoreEmulator,
   getFirestore,
 } from "firebase/firestore";
+import {
+  FirebaseStorage,
+  connectStorageEmulator,
+  getStorage,
+} from "firebase/storage";
 
 import {
   firebaseConfig,
@@ -17,6 +22,7 @@ import {
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
+let storage: FirebaseStorage | null = null;
 
 type EmulatorGlobalState = {
   __equippdFirebaseEmulatorsConnected?: boolean;
@@ -48,6 +54,7 @@ if (isFirebaseConfigured()) {
   });
   auth = authClient;
   db = getFirestore(app);
+  storage = getStorage(app);
 
   if (
     firebaseEmulatorConfig.enabled &&
@@ -65,9 +72,14 @@ if (isFirebaseConfigured()) {
       firebaseEmulatorConfig.firestoreHost,
       firebaseEmulatorConfig.firestorePort,
     );
+    connectStorageEmulator(
+      storage,
+      firebaseEmulatorConfig.storageHost,
+      firebaseEmulatorConfig.storagePort,
+    );
     emulatorGlobalState.__equippdFirebaseEmulatorsConnected = true;
   }
 }
 
 export const firebaseApp = app;
-export { auth, db };
+export { auth, db, storage };

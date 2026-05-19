@@ -7,7 +7,7 @@ type Props = {
   subtitle?: string;
 };
 
-export function SectionHeader({ title, subtitle }: Props) {
+export function PageHeader({ title, subtitle }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
@@ -22,8 +22,8 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: 21,
-    fontWeight: "700",
+    fontSize: 32,
+    fontWeight: "800",
   },
   subtitle: {
     color: colors.mutedText,

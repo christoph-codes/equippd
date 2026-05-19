@@ -16,6 +16,7 @@ import { NoteCard } from "@/src/components/cards/NoteCard";
 import { StudyCard } from "@/src/components/cards/StudyCard";
 import { Button } from "@/src/components/ui/Button";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { PageHeader } from "@/src/components/ui/PageHeader";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -195,7 +196,7 @@ export default function GroupDetailScreen() {
         />
       }
     >
-      <SectionHeader
+      <PageHeader
         title={group?.name ?? "Group"}
         subtitle={group?.description}
       />

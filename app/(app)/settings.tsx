@@ -1,12 +1,13 @@
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
 
-import { Button } from '@/src/components/ui/Button';
-import { Card } from '@/src/components/ui/Card';
-import { ScreenContainer } from '@/src/components/ui/ScreenContainer';
-import { SectionHeader } from '@/src/components/ui/SectionHeader';
-import { useAuth } from '@/src/hooks/useAuth';
-import { isFirebaseConfigured } from '@/src/services/firebase/config';
-import { listContentPaths } from '@/src/services/content/mdx';
+import { Button } from "@/src/components/ui/Button";
+import { Card } from "@/src/components/ui/Card";
+import { PageHeader } from "@/src/components/ui/PageHeader";
+import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
+import { SectionHeader } from "@/src/components/ui/SectionHeader";
+import { useAuth } from "@/src/hooks/useAuth";
+import { listContentPaths } from "@/src/services/content/mdx";
+import { isFirebaseConfigured } from "@/src/services/firebase/config";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -14,17 +15,40 @@ export default function SettingsScreen() {
 
   async function onLogout() {
     await signOut();
-    router.replace('/login');
+    router.replace("/login");
   }
 
   return (
     <ScreenContainer>
-      <SectionHeader title="Settings" subtitle="Manage session and inspect foundation setup status." />
+      <PageHeader
+        title="Settings"
+        subtitle="App configuration and account shortcuts."
+      />
       <Card>
-        <SectionHeader title="Firebase" subtitle={isFirebaseConfigured() ? 'Configured' : 'Missing EXPO_PUBLIC_FIREBASE_* values'} />
+        <SectionHeader
+          title="Account"
+          subtitle="Manage your profile, password, and photo in one place."
+        />
+        <Button
+          label="Open account management"
+          onPress={() => router.push("/(app)/account")}
+        />
       </Card>
       <Card>
-        <SectionHeader title="Managed Content Paths" subtitle={listContentPaths().join('\n')} />
+        <SectionHeader
+          title="Firebase"
+          subtitle={
+            isFirebaseConfigured()
+              ? "Configured"
+              : "Missing EXPO_PUBLIC_FIREBASE_* values"
+          }
+        />
+      </Card>
+      <Card>
+        <SectionHeader
+          title="Managed Content Paths"
+          subtitle={listContentPaths().join("\n")}
+        />
       </Card>
       <Button label="Log out" onPress={onLogout} variant="danger" />
     </ScreenContainer>

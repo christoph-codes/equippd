@@ -14,6 +14,7 @@ import { GroupCard } from "@/src/components/cards/GroupCard";
 import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { LoadingOverlay } from "@/src/components/ui/LoadingOverlay";
 import { Modal } from "@/src/components/ui/Modal";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { ScreenIntro } from "@/src/components/ui/ScreenIntro";
@@ -41,6 +42,7 @@ export default function GroupsScreen() {
   );
   const [busyId, setBusyId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [requestModalVisible, setRequestModalVisible] = useState(false);
 
   const loadGroups = useCallback(async () => {
@@ -48,18 +50,23 @@ export default function GroupsScreen() {
       return;
     }
 
-    const [nextGroups, nextMemberships, nextRequests, nextPendingRequests] =
-      await Promise.all([
-        fetchAllGroups(),
-        fetchUserGroups(user.uid),
-        fetchUserAccessRequests(user.uid),
-        isAdmin ? fetchPendingAccessRequests() : Promise.resolve([]),
-      ]);
+    setLoading(true);
+    try {
+      const [nextGroups, nextMemberships, nextRequests, nextPendingRequests] =
+        await Promise.all([
+          fetchAllGroups(),
+          fetchUserGroups(user.uid),
+          fetchUserAccessRequests(user.uid),
+          isAdmin ? fetchPendingAccessRequests() : Promise.resolve([]),
+        ]);
 
-    setGroups(nextGroups);
-    setMemberships(nextMemberships);
-    setRequests(nextRequests);
-    setPendingRequests(nextPendingRequests);
+      setGroups(nextGroups);
+      setMemberships(nextMemberships);
+      setRequests(nextRequests);
+      setPendingRequests(nextPendingRequests);
+    } finally {
+      setLoading(false);
+    }
   }, [isAdmin, user]);
 
   const onRefresh = useCallback(async () => {
@@ -358,6 +365,7 @@ export default function GroupsScreen() {
           )}
         </ScrollView>
       </Modal>
+      <LoadingOverlay visible={loading} />
     </View>
   );
 }

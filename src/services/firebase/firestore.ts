@@ -49,7 +49,9 @@ function formatTimestamp(value: unknown) {
 }
 
 export async function upsertUserProfile(
-  profile: Pick<UserProfile, "uid" | "displayName" | "email">,
+  profile: Pick<UserProfile, "uid" | "displayName" | "email"> & {
+    photoURL?: string | null;
+  },
 ) {
   const dbClient = requireDb();
   const ref = doc(dbClient, "users", profile.uid);
@@ -61,6 +63,7 @@ export async function upsertUserProfile(
       uid: profile.uid,
       displayName: profile.displayName,
       email: profile.email,
+      photoURL: profile.photoURL ?? null,
       createdAt: snapshot.exists()
         ? snapshot.data().createdAt
         : serverTimestamp(),
@@ -83,6 +86,7 @@ export async function fetchUserProfile(userId: string) {
     uid: data.uid,
     displayName: data.displayName,
     email: data.email,
+    photoURL: data.photoURL ?? null,
     role: data.role,
     createdAt: formatTimestamp(data.createdAt),
     updatedAt: formatTimestamp(data.updatedAt),

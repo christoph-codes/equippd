@@ -70,6 +70,12 @@ export const firebaseEmulatorConfig = {
     readEnvValue("EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_PORT"),
     8080,
   ),
+  storageHost:
+    readEnvValue("EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_HOST") || "127.0.0.1",
+  storagePort: parsePort(
+    readEnvValue("EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_PORT"),
+    9199,
+  ),
 };
 
 export function isFirebaseConfigured() {

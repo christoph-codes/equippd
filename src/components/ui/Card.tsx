@@ -18,6 +18,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 14,
     padding: 14,
-    gap: 10,
+    gap: 16,
   },
 });
