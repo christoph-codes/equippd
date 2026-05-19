@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Pressable,
   RefreshControl,
@@ -70,23 +70,6 @@ export default function NotesScreen() {
     isAdmin &&
     Boolean(editingNote?.userId) &&
     editingNote?.userId !== user?.uid;
-  const latestUpdatedLabel = useMemo(() => {
-    if (!notes.length) {
-      return "";
-    }
-
-    const latestUpdatedAt = notes.reduce((latest, note) => {
-      return new Date(note.updatedAt) > new Date(latest.updatedAt)
-        ? note
-        : latest;
-    }, notes[0]);
-
-    return `Updated ${new Intl.DateTimeFormat(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(new Date(latestUpdatedAt.updatedAt))}`;
-  }, [notes]);
 
   const loadNotes = useCallback(async () => {
     if (!user) {

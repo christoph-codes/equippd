@@ -40,7 +40,7 @@ service cloud.firestore {
 
     match /groups/{groupId} {
       allow read: if isSignedIn();
-      allow write: if false;
+      allow create, update, delete: if isAdmin();
 
       match /members/{userId} {
         // Use resource ownership for read so collectionGroup queries can be authorized.

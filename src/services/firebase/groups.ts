@@ -242,3 +242,63 @@ export async function approveGroupAccessRequest(
 
   await batch.commit();
 }
+
+export async function rejectGroupAccessRequest(
+  request: GroupAccessRequest,
+  adminUserId: string,
+) {
+  const dbClient = requireDb();
+  const requestRef = doc(
+    dbClient,
+    "groups",
+    request.groupId,
+    "accessRequests",
+    request.userId,
+  );
+
+  await setDoc(
+    requestRef,
+    {
+      status: "rejected",
+      reviewedBy: adminUserId,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+}
+
+type CreateGroupInput = {
+  name: string;
+  slug: string;
+  description: string;
+};
+
+export async function createGroup(input: CreateGroupInput) {
+  const dbClient = requireDb();
+  const normalizedSlug = input.slug.trim().toLowerCase();
+
+  if (!normalizedSlug) {
+    throw new Error("Group slug is required.");
+  }
+
+  const existing = await fetchGroupsBySlug(normalizedSlug);
+  if (existing.length > 0) {
+    throw new Error("A group with this slug already exists.");
+  }
+
+  const groupRef = doc(collection(dbClient, "groups"));
+  await setDoc(groupRef, {
+    name: input.name.trim(),
+    slug: normalizedSlug,
+    description: input.description.trim(),
+    organization: "Equippd",
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  const createdSnapshot = await getDoc(groupRef);
+  return {
+    id: createdSnapshot.id,
+    ...(createdSnapshot.data() as Omit<Group, "id">),
+  };
+}

@@ -10,7 +10,6 @@ import {
   View,
 } from "react-native";
 
-import { GroupCard } from "@/src/components/cards/GroupCard";
 import { Button } from "@/src/components/ui/Button";
 import { Card } from "@/src/components/ui/Card";
 import { EmptyState } from "@/src/components/ui/EmptyState";
@@ -19,14 +18,17 @@ import { Modal } from "@/src/components/ui/Modal";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { ScreenIntro } from "@/src/components/ui/ScreenIntro";
 import { SectionHeader } from "@/src/components/ui/SectionHeader";
+import { TextInput } from "@/src/components/ui/TextInput";
 import { useAuth } from "@/src/hooks/useAuth";
 import { Group, GroupAccessRequest } from "@/src/models/types";
 import {
   approveGroupAccessRequest,
+  createGroup,
   fetchAllGroups,
   fetchPendingAccessRequests,
   fetchUserAccessRequests,
   fetchUserGroups,
+  rejectGroupAccessRequest,
   requestGroupAccess,
 } from "@/src/services/firebase/groups";
 import { colors } from "@/src/theme/colors";
@@ -44,6 +46,11 @@ export default function GroupsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [requestModalVisible, setRequestModalVisible] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [creatingGroup, setCreatingGroup] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [groupSlug, setGroupSlug] = useState("");
+  const [groupDescription, setGroupDescription] = useState("");
 
   const loadGroups = useCallback(async () => {
     if (!user) {
@@ -171,6 +178,58 @@ export default function GroupsScreen() {
     }
   }
 
+  async function onRejectRequest(request: GroupAccessRequest) {
+    if (!user) {
+      return;
+    }
+
+    setBusyId(request.id);
+    try {
+      await rejectGroupAccessRequest(request, user.uid);
+      await loadGroups();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function onCreateGroup() {
+    const normalizedSlug = groupSlug
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+
+    if (!groupName.trim() || !normalizedSlug || !groupDescription.trim()) {
+      alert("Please complete all fields before creating a group.");
+      return;
+    }
+
+    setCreatingGroup(true);
+    try {
+      await createGroup({
+        name: groupName,
+        slug: normalizedSlug,
+        description: groupDescription,
+      });
+
+      setGroupName("");
+      setGroupSlug("");
+      setGroupDescription("");
+      setCreateModalVisible(false);
+      await loadGroups();
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to create this group right now.";
+      alert(message);
+    } finally {
+      setCreatingGroup(false);
+    }
+  }
+
   function statusLabel(status: GroupAccessRequest["status"]) {
     if (status === "approved") {
       return "Visit";
@@ -223,85 +282,93 @@ export default function GroupsScreen() {
                 <Text style={styles.description}>
                   Requested access to {request.groupName}
                 </Text>
-                <Button
-                  disabled={busyId === request.id}
-                  label={busyId === request.id ? "Approving..." : "Approve"}
-                  onPress={() => onApproveRequest(request)}
-                />
+                <View style={styles.requestActions}>
+                  <Button
+                    disabled={busyId === request.id}
+                    label={busyId === request.id ? "Approving..." : "Approve"}
+                    onPress={() => onApproveRequest(request)}
+                    size="small"
+                  />
+                  <Button
+                    disabled={busyId === request.id}
+                    label={busyId === request.id ? "Rejecting..." : "Deny"}
+                    onPress={() => onRejectRequest(request)}
+                    size="small"
+                    variant="danger"
+                  />
+                </View>
               </Card>
             ))}
           </>
         ) : null}
 
-        {isAdmin ? (
-          <>
-            <SectionHeader title="All Groups" />
-            {groups.length ? (
-              groups.map((group) => (
-                <GroupCard
-                  key={group.id}
-                  group={group}
-                  onPress={() => router.push(`/(app)/groups/${group.slug}`)}
-                />
-              ))
-            ) : (
-              <EmptyState
-                title="No groups found"
-                description="Groups will appear here after an admin creates them."
-              />
-            )}
-          </>
-        ) : (
-          <>
-            <SectionHeader title="My groups" />
-            {myGroups.length ? (
-              myGroups.map(({ group, status }) => {
-                const openGroup = canOpenGroup(status);
+        <>
+          {myGroups.length ? (
+            myGroups.map(({ group, status }) => {
+              const openGroup = canOpenGroup(status);
 
-                return (
-                  <Card key={group.id}>
-                    <View style={styles.cardHeader}>
-                      <View style={styles.cardCopy}>
-                        <Text style={styles.title}>{group.name}</Text>
-                      </View>
-                      {openGroup ? (
-                        <Button
-                          label="Visit"
-                          size="small"
-                          onPress={() =>
-                            router.push(`/(app)/groups/${group.slug}`)
-                          }
-                        />
-                      ) : (
-                        <View style={[styles.statusPill, statusTone(status)]}>
-                          <Text style={styles.statusText}>
-                            {statusLabel(status)}
-                          </Text>
-                        </View>
-                      )}
+              return (
+                <Card key={group.id}>
+                  <View style={styles.cardHeader}>
+                    <View style={styles.cardCopy}>
+                      <Text style={styles.title}>{group.name}</Text>
                     </View>
-                    <Text style={styles.description}>{group.description}</Text>
-                  </Card>
-                );
-              })
-            ) : (
-              <EmptyState
-                title="No groups yet"
-                description="Tap the + button to request access to a group."
-              />
-            )}
-          </>
-        )}
+                    {openGroup ? (
+                      <Button
+                        label="Visit"
+                        size="small"
+                        onPress={() =>
+                          router.push(`/(app)/groups/${group.slug}`)
+                        }
+                      />
+                    ) : (
+                      <View style={[styles.statusPill, statusTone(status)]}>
+                        <Text style={styles.statusText}>
+                          {statusLabel(status)}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.description}>{group.description}</Text>
+                </Card>
+              );
+            })
+          ) : (
+            <EmptyState
+              title="No groups yet"
+              description="You haven't joined or requested a group yet. Tap the search button to browse available groups."
+            />
+          )}
+        </>
       </ScreenContainer>
 
-      {!isAdmin ? (
+      {isAdmin ? (
+        <>
+          <Pressable
+            style={[styles.floatingButton, styles.floatingSecondaryButton]}
+            onPress={() => setRequestModalVisible(true)}
+          >
+            <Ionicons
+              name="search-outline"
+              size={26}
+              color={colors.background}
+            />
+          </Pressable>
+          <Pressable
+            style={styles.floatingButton}
+            onPress={() => setCreateModalVisible(true)}
+          >
+            <Ionicons name="add" size={28} color={colors.background} />
+          </Pressable>
+        </>
+      ) : (
         <Pressable
           style={styles.floatingButton}
           onPress={() => setRequestModalVisible(true)}
         >
           <Ionicons name="add" size={28} color={colors.background} />
         </Pressable>
-      ) : null}
+      )}
 
       <Modal
         onRequestClose={() => setRequestModalVisible(false)}
@@ -324,7 +391,16 @@ export default function GroupsScreen() {
                     <View style={styles.cardCopy}>
                       <Text style={styles.title}>{group.name}</Text>
                     </View>
-                    {canVisit ? (
+                    {isAdmin ? (
+                      <Button
+                        label="Visit"
+                        size="small"
+                        onPress={() => {
+                          router.push(`/(app)/groups/${group.slug}`);
+                          setRequestModalVisible(false);
+                        }}
+                      />
+                    ) : canVisit ? (
                       <Button
                         label="Visit"
                         size="small"
@@ -365,6 +441,69 @@ export default function GroupsScreen() {
           )}
         </ScrollView>
       </Modal>
+
+      <Modal
+        onRequestClose={() => setCreateModalVisible(false)}
+        sheetStyle={styles.requestSheet}
+        showHandle
+        visible={createModalVisible}
+      >
+        <Text style={styles.requestTitle}>Create Group</Text>
+
+        <View style={styles.createForm}>
+          <TextInput
+            label="Group Name"
+            value={groupName}
+            onChangeText={(value) => {
+              setGroupName(value);
+              if (!groupSlug) {
+                setGroupSlug(
+                  value
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, ""),
+                );
+              }
+            }}
+            placeholder="The Brothers"
+          />
+          <TextInput
+            label="Slug"
+            value={groupSlug}
+            onChangeText={setGroupSlug}
+            placeholder="the-brothers"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <TextInput
+            label="Description"
+            value={groupDescription}
+            onChangeText={setGroupDescription}
+            placeholder="Short description of this group"
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+            style={styles.descriptionInput}
+          />
+          <View style={styles.createActions}>
+            <View style={styles.actionButtonWrap}>
+              <Button
+                label="Cancel"
+                onPress={() => setCreateModalVisible(false)}
+                variant="ghost"
+                disabled={creatingGroup}
+              />
+            </View>
+            <View style={styles.actionButtonWrap}>
+              <Button
+                label={creatingGroup ? "Creating..." : "Create"}
+                onPress={() => void onCreateGroup()}
+                disabled={creatingGroup}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
       <LoadingOverlay visible={loading} />
     </View>
   );
@@ -398,6 +537,11 @@ const styles = StyleSheet.create({
   description: {
     color: colors.mutedText,
     lineHeight: 20,
+  },
+  requestActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 8,
   },
   statusPill: {
     borderRadius: 999,
@@ -434,6 +578,22 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingBottom: 16,
   },
+  createForm: {
+    gap: 12,
+    paddingBottom: 16,
+  },
+  descriptionInput: {
+    minHeight: 88,
+  },
+  createActions: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 8,
+    marginTop: 4,
+  },
+  actionButtonWrap: {
+    flex: 1,
+  },
   floatingButton: {
     position: "absolute",
     bottom: 16,
@@ -449,5 +609,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  floatingSecondaryButton: {
+    bottom: 84,
   },
 });
