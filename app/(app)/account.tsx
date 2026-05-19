@@ -18,6 +18,30 @@ import {
 } from "@/src/services/firebase/storage";
 import { colors } from "@/src/theme/colors";
 
+const PROFILE_REFRESH_TIMEOUT_MS = 10000;
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(
+        new Error(
+          "Profile refresh timed out. Please check your connection and try again.",
+        ),
+      );
+    }, timeoutMs);
+
+    promise
+      .then((value) => {
+        clearTimeout(timeoutId);
+        resolve(value);
+      })
+      .catch((error: unknown) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
+}
+
 function formatDateTime(value?: string | null) {
   if (!value) {
     return "-";
@@ -89,7 +113,7 @@ export default function AccountScreen() {
     setSavingName(true);
     try {
       await updateProfile(nextName, activePhotoURL);
-      await refreshProfile();
+      await withTimeout(refreshProfile(), PROFILE_REFRESH_TIMEOUT_MS);
       Alert.alert("Profile Updated", "Your display name has been updated.");
     } catch (err) {
       Alert.alert("Could Not Update Profile", (err as Error).message);
@@ -116,7 +140,7 @@ export default function AccountScreen() {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
-      mediaTypes: ImagePicker.MediaType.Images,
+      mediaTypes: ["images"],
     });
 
     if (result.canceled || !result.assets?.[0]?.uri) {
@@ -125,10 +149,15 @@ export default function AccountScreen() {
 
     setSavingPhoto(true);
     try {
+      const selectedAsset = result.assets[0];
       const previousPhotoURL = activePhotoURL;
       const uploadedPhotoURL = await uploadProfilePhoto(
         user.uid,
-        result.assets[0].uri,
+        selectedAsset.uri,
+        {
+          fileName: selectedAsset.fileName ?? undefined,
+          mimeType: selectedAsset.mimeType ?? undefined,
+        },
       );
       await updateProfile(
         displayName.trim() ||
@@ -138,9 +167,9 @@ export default function AccountScreen() {
         uploadedPhotoURL,
       );
       if (previousPhotoURL && previousPhotoURL !== uploadedPhotoURL) {
-        await deleteFileByUrl(previousPhotoURL);
+        void deleteFileByUrl(previousPhotoURL);
       }
-      await refreshProfile();
+      await withTimeout(refreshProfile(), PROFILE_REFRESH_TIMEOUT_MS);
       Alert.alert("Photo Updated", "Your profile photo has been uploaded.");
     } catch (err) {
       Alert.alert("Could Not Upload Photo", (err as Error).message);
@@ -163,8 +192,8 @@ export default function AccountScreen() {
           "Member",
         null,
       );
-      await deleteFileByUrl(activePhotoURL);
-      await refreshProfile();
+      void deleteFileByUrl(activePhotoURL);
+      await withTimeout(refreshProfile(), PROFILE_REFRESH_TIMEOUT_MS);
       Alert.alert("Photo Removed", "Your profile photo was removed.");
     } catch (err) {
       Alert.alert("Could Not Remove Photo", (err as Error).message);

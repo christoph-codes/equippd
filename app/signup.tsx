@@ -1,6 +1,12 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { BrandLogo } from "@/src/components/brand/BrandLogo";
 import { Button } from "@/src/components/ui/Button";
@@ -31,47 +37,61 @@ export default function SignupScreen() {
   }
 
   return (
-    <ScreenContainer edges={["top", "left", "right"]} centered>
-      <BrandLogo width={160} />
-      <Text style={styles.subtitle}>
-        Join Equippd to strengthen your walk through community and studies.
-      </Text>
-      <View style={styles.form}>
-        <TextInput
-          label="Display name"
-          onChangeText={setDisplayName}
-          value={displayName}
-        />
-        <TextInput
-          autoCapitalize="none"
-          keyboardType="email-address"
-          label="Email"
-          onChangeText={setEmail}
-          value={email}
-        />
-        <TextInput
-          label="Password"
-          onChangeText={setPassword}
-          secureTextEntry
-          value={password}
-        />
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Button
-          disabled={loading}
-          label={loading ? "Creating account..." : "Sign up"}
-          onPress={onSignup}
-        />
-        <Button
-          label="Back to log in"
-          onPress={() => router.replace("/login")}
-          variant="ghost"
-        />
-      </View>
-    </ScreenContainer>
+    <KeyboardAvoidingView
+      style={styles.keyboardContainer}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScreenContainer edges={["top", "left", "right"]}>
+        <View style={styles.logoWrap}>
+          <BrandLogo width={160} />
+        </View>
+        <Text style={styles.subtitle}>
+          Join Equippd to strengthen your walk through community and studies.
+        </Text>
+        <View style={styles.form}>
+          <TextInput
+            label="Display name"
+            onChangeText={setDisplayName}
+            value={displayName}
+          />
+          <TextInput
+            autoCapitalize="none"
+            keyboardType="email-address"
+            label="Email"
+            onChangeText={setEmail}
+            value={email}
+          />
+          <TextInput
+            label="Password"
+            onChangeText={setPassword}
+            secureTextEntry
+            value={password}
+          />
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <Button
+            disabled={loading}
+            label={loading ? "Creating account..." : "Sign up"}
+            onPress={onSignup}
+          />
+          <Button
+            label="Back to log in"
+            onPress={() => router.replace("/login")}
+            variant="ghost"
+          />
+        </View>
+      </ScreenContainer>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  keyboardContainer: {
+    flex: 1,
+  },
+  logoWrap: {
+    alignItems: "center",
+    marginTop: 24,
+  },
   subtitle: {
     fontSize: 14,
     color: colors.mutedText,

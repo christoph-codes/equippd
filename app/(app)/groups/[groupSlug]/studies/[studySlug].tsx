@@ -2,13 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-	Pressable,
-	RefreshControl,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TextInput,
-	View,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import Markdown from "react-native-markdown-display";
 
@@ -22,14 +22,15 @@ import { SectionHeader } from "@/src/components/ui/SectionHeader";
 import { useAuth } from "@/src/hooks/useAuth";
 import { Note, Study } from "@/src/models/types";
 import {
-	fetchStudyBySlug,
-	fetchStudyReactionSummary,
-	saveNote,
-	saveStudy,
-	toggleStudyReaction,
+  fetchStudyBySlug,
+  fetchStudyReactionSummary,
+  saveNote,
+  saveStudy,
+  toggleStudyReaction,
 } from "@/src/services/firebase/firestore";
 import { canAccessGroup } from "@/src/services/firebase/groups";
 import { fetchNotesWithUserInfo } from "@/src/services/firebase/notes";
+import { formatDate } from "@/src/services/utils/helpers";
 import { colors } from "@/src/theme/colors";
 
 type NoteWithUser = Note & {
@@ -300,15 +301,6 @@ export default function StudyDetailScreen() {
     );
   }
 
-  const createdAt = (date?: string) => {
-    if (!date) return "";
-    return new Intl.DateTimeFormat(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(new Date(date));
-  };
-
   if (!study) {
     return (
       <ScreenContainer>
@@ -325,7 +317,7 @@ export default function StudyDetailScreen() {
       <ScreenContainer>
         <Text
           style={styles.studyMeta}
-        >{`${study.scripture} • ${createdAt(study.createdAt)}`}</Text>
+        >{`${study.scripture} • ${formatDate(study.createdAt)}`}</Text>
         <Markdown style={markdownStyles}>{study.content}</Markdown>
 
         <SectionHeader title="React to this study" />
