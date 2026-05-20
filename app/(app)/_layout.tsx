@@ -94,6 +94,10 @@ export default function AppLayout() {
         name="notes/[noteId]"
         options={{ href: null, title: "Note" }}
       />
+      <Tabs.Screen
+        name="chat/[threadId]"
+        options={{ href: null, title: "Chat" }}
+      />
       <Tabs.Screen name="shop" options={{ href: null, title: "Shop" }} />
       <Tabs.Screen
         name="settings"

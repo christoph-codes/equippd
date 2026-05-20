@@ -105,3 +105,31 @@ export type Song = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type ThreadParticipant = {
+  userId: string;
+  displayName: string;
+  photoURL?: string | null;
+};
+
+export type MessageThreadSummary = {
+  id: string;
+  participantIds: string[];
+  otherParticipant: ThreadParticipant;
+  lastMessageText: string;
+  lastMessageSenderId: string;
+  lastMessageAt: string;
+  lastReadAt: string | null;
+  unread: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ChatMessage = {
+  id: string;
+  threadId: string;
+  senderId: string;
+  senderDisplayName: string;
+  text: string;
+  createdAt: string;
+};

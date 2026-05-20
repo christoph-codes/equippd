@@ -9,6 +9,22 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function isThreadParticipant(data) {
+      return isSignedIn() &&
+        data.participantIds is list &&
+        data.participantIds.hasAny([request.auth.uid]);
+    }
+
+    function isValidThread(data) {
+      return data.participantIds is list &&
+        data.participantIds.size() == 2;
+    }
+
+    function canAccessThread(threadId) {
+      return isSignedIn() &&
+        isThreadParticipant(get(/databases/$(database)/documents/threads/$(threadId)).data);
+    }
+
     function isAdmin() {
       return isSignedIn() && (
         request.auth.token.admin == true ||
@@ -32,10 +48,25 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isSelf(userId) || isAdmin();
+      allow read: if isSignedIn();
       allow create: if isSelf(userId) && doesNotWriteRole();
       allow update: if isSelf(userId) && roleIsUnchanged();
       allow delete: if false;
+    }
+
+    match /threads/{threadId} {
+      allow read: if isThreadParticipant(resource.data);
+      allow create: if isThreadParticipant(request.resource.data) && isValidThread(request.resource.data);
+      allow update: if isThreadParticipant(resource.data) && isValidThread(resource.data);
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if canAccessThread(threadId);
+        allow create: if canAccessThread(threadId) &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.resource.data.threadId == threadId;
+        allow update, delete: if false;
+      }
     }
 
     match /groups/{groupId} {
