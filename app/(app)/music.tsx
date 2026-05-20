@@ -42,11 +42,11 @@ export default function MusicScreen() {
         }
         const [approved, pending] = await Promise.all([
           fetchApprovedSongs(),
-          user ? fetchPendingSongs() : Promise.resolve([]),
+          isAdmin ? fetchPendingSongs() : Promise.resolve([]),
         ]);
 
         setApprovedSongs(approved);
-        if (user) {
+        if (isAdmin) {
           setPendingSongs(pending);
         }
       } catch (error) {
