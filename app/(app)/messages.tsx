@@ -3,6 +3,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -34,6 +35,7 @@ export default function MessagesScreen() {
   const [chatCandidates, setChatCandidates] = useState<Candidate[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingThreads, setIsLoadingThreads] = useState(true);
+  const [threadsError, setThreadsError] = useState<string | null>(null);
   const [isLoadingCandidates, setIsLoadingCandidates] = useState(false);
   const [isStartingChatWith, setIsStartingChatWith] = useState<string | null>(null);
   const [pickerVisible, setPickerVisible] = useState(false);
@@ -42,11 +44,6 @@ export default function MessagesScreen() {
   const currentUserId = user?.uid ?? "";
   const currentDisplayName =
     profile?.displayName ?? user?.displayName ?? "Equippd User";
-
-  const userThreadIds = useMemo(
-    () => new Set(threads.map((thread) => thread.id)),
-    [threads],
-  );
 
   const filteredCandidates = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -92,11 +89,16 @@ export default function MessagesScreen() {
       const unsubscribe = subscribeToDirectThreads(
         currentUserId,
         (nextThreads) => {
+          setThreadsError(null);
           setThreads(nextThreads);
           setIsLoadingThreads(false);
         },
-        () => {
+        (error) => {
           setIsLoadingThreads(false);
+          const message =
+            error?.message ?? "Could not load conversations right now.";
+          setThreadsError(message);
+          Alert.alert("Messages unavailable", message);
         },
       );
 
@@ -134,20 +136,7 @@ export default function MessagesScreen() {
         return;
       }
 
-      const existingThreadId = [currentUserId, candidate.userId].sort().join("__");
-
       setPickerVisible(false);
-
-      if (userThreadIds.has(existingThreadId)) {
-        router.push({
-          pathname: "/(app)/chat/[threadId]",
-          params: {
-            threadId: existingThreadId,
-            otherUserName: candidate.displayName,
-          },
-        });
-        return;
-      }
 
       setIsStartingChatWith(candidate.userId);
       try {
@@ -166,11 +155,21 @@ export default function MessagesScreen() {
             otherUserName: candidate.displayName,
           },
         });
+      } catch (err) {
+        console.error("Failed to start chat:", err);
+        let message = "We couldn't open this conversation. Please try again.";
+        if (err && typeof err === "object" && "message" in err && typeof err.message === "string") {
+          message = err.message;
+        }
+        Alert.alert(
+          "Could not start chat",
+          message,
+        );
       } finally {
         setIsStartingChatWith(null);
       }
     },
-    [currentDisplayName, currentUserId, router, user?.photoURL, userThreadIds],
+    [currentDisplayName, currentUserId, router, user?.photoURL],
   );
 
   const renderThread = (item: MessageThreadSummary) => {
@@ -241,6 +240,11 @@ export default function MessagesScreen() {
           <View style={styles.loadingState}>
             <ActivityIndicator color={colors.accent} />
           </View>
+        ) : threadsError ? (
+          <EmptyState
+            title="Unable to load conversations"
+            description={threadsError}
+          />
         ) : threads.length === 0 ? (
           <EmptyState
             title="No conversations yet"

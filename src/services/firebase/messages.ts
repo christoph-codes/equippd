@@ -2,17 +2,17 @@ import {
   DocumentData,
   QueryDocumentSnapshot,
   Timestamp,
-  addDoc,
   collection,
   doc,
   getDoc,
   getDocs,
+  limit,
   onSnapshot,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
-  updateDoc,
-  where,
+  startAfter,
   writeBatch,
 } from "firebase/firestore";
 
@@ -27,6 +27,12 @@ type ThreadUser = {
   userId: string;
   displayName: string;
   photoURL?: string | null;
+};
+
+export type MessagePage = {
+  messages: ChatMessage[];
+  oldestCursor: QueryDocumentSnapshot<DocumentData> | null;
+  hasMore: boolean;
 };
 
 function requireDb() {
@@ -158,7 +164,9 @@ function mapThreadSummaryFromData(
   };
 }
 
-function mapChatMessage(snapshot: QueryDocumentSnapshot<DocumentData>): ChatMessage {
+function mapChatMessage(
+  snapshot: QueryDocumentSnapshot<DocumentData>,
+): ChatMessage {
   const data = snapshot.data();
   return {
     id: snapshot.id,
@@ -170,7 +178,9 @@ function mapChatMessage(snapshot: QueryDocumentSnapshot<DocumentData>): ChatMess
   };
 }
 
-export async function fetchChatCandidates(userId: string): Promise<ThreadUser[]> {
+export async function fetchChatCandidates(
+  userId: string,
+): Promise<ThreadUser[]> {
   const dbClient = requireDb();
   const snapshot = await getDocs(collection(dbClient, "users"));
 
@@ -194,38 +204,53 @@ export async function ensureDirectThread(
   const dbClient = requireDb();
   const threadId = buildDirectThreadId(currentUser.userId, otherUser.userId);
   const threadRef = doc(dbClient, "threads", threadId);
-  const existingThread = await getDoc(threadRef);
-
-  if (existingThread.exists()) {
-    return threadId;
-  }
-
-  await setDoc(
-    threadRef,
-    {
-      participantIds: [currentUser.userId, otherUser.userId].sort(),
-      participants: {
-        [currentUser.userId]: {
-          displayName: currentUser.displayName,
-          photoURL: currentUser.photoURL ?? null,
-        },
-        [otherUser.userId]: {
-          displayName: otherUser.displayName,
-          photoURL: otherUser.photoURL ?? null,
-        },
-      },
-      lastMessageText: "",
-      lastMessageSenderId: "",
-      lastMessageAt: serverTimestamp(),
-      readBy: {
-        [currentUser.userId]: serverTimestamp(),
-        [otherUser.userId]: serverTimestamp(),
-      },
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true },
+  const currentUserThreadRef = doc(
+    dbClient,
+    "users",
+    currentUser.userId,
+    "threads",
+    threadId,
   );
+  const otherUserThreadRef = doc(
+    dbClient,
+    "users",
+    otherUser.userId,
+    "threads",
+    threadId,
+  );
+  const initialThreadPayload = {
+    participantIds: [currentUser.userId, otherUser.userId].sort(),
+    participants: {
+      [currentUser.userId]: {
+        displayName: currentUser.displayName,
+        photoURL: currentUser.photoURL ?? null,
+      },
+      [otherUser.userId]: {
+        displayName: otherUser.displayName,
+        photoURL: otherUser.photoURL ?? null,
+      },
+    },
+    lastMessageText: "",
+    lastMessageSenderId: "",
+    lastMessageAt: serverTimestamp(),
+    readBy: {
+      [currentUser.userId]: serverTimestamp(),
+      [otherUser.userId]: serverTimestamp(),
+    },
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+  const participantPayload = {
+    participantIds: initialThreadPayload.participantIds,
+    participants: initialThreadPayload.participants,
+    updatedAt: serverTimestamp(),
+  };
+
+  await Promise.all([
+    setDoc(threadRef, participantPayload, { merge: true }),
+    setDoc(currentUserThreadRef, participantPayload, { merge: true }),
+    setDoc(otherUserThreadRef, participantPayload, { merge: true }),
+  ]);
 
   return threadId;
 }
@@ -236,10 +261,7 @@ export function subscribeToDirectThreads(
   onError?: (error: Error) => void,
 ) {
   const dbClient = requireDb();
-  const threadsQuery = query(
-    collection(dbClient, "threads"),
-    where("participantIds", "array-contains", userId),
-  );
+  const threadsQuery = query(collection(dbClient, "users", userId, "threads"));
 
   return onSnapshot(
     threadsQuery,
@@ -282,24 +304,54 @@ export function subscribeToThreadSummary(
 
 export function subscribeToThreadMessages(
   threadId: string,
+  pageSize: number,
   onData: (messages: ChatMessage[]) => void,
+  onPage?: (page: MessagePage) => void,
   onError?: (error: Error) => void,
 ) {
   const dbClient = requireDb();
-  const messagesQuery = query(collection(dbClient, "threads", threadId, "messages"));
+  const messagesQuery = query(
+    collection(dbClient, "threads", threadId, "messages"),
+    orderBy("createdAt", "desc"),
+    limit(pageSize),
+  );
 
   return onSnapshot(
     messagesQuery,
     (snapshot) => {
-      const messages = snapshot.docs
-        .map(mapChatMessage)
-        .sort((a, b) => toMillis(a.createdAt) - toMillis(b.createdAt));
+      const messages = snapshot.docs.map(mapChatMessage).reverse();
+      onPage?.({
+        messages,
+        oldestCursor: snapshot.docs[snapshot.docs.length - 1] ?? null,
+        hasMore: snapshot.docs.length === pageSize,
+      });
       onData(messages);
     },
     (error) => {
       onError?.(error);
     },
   );
+}
+
+export async function fetchOlderThreadMessages(
+  threadId: string,
+  cursor: QueryDocumentSnapshot<DocumentData>,
+  pageSize: number,
+): Promise<MessagePage> {
+  const dbClient = requireDb();
+  const messagesQuery = query(
+    collection(dbClient, "threads", threadId, "messages"),
+    orderBy("createdAt", "desc"),
+    startAfter(cursor),
+    limit(pageSize),
+  );
+  const snapshot = await getDocs(messagesQuery);
+
+  return {
+    messages: snapshot.docs.map(mapChatMessage).reverse(),
+    oldestCursor: snapshot.docs[snapshot.docs.length - 1] ?? null,
+    hasMore: snapshot.docs.length === pageSize,
+  };
 }
 
 export async function sendMessageToThread(input: {
@@ -316,6 +368,13 @@ export async function sendMessageToThread(input: {
   }
 
   const threadRef = doc(dbClient, "threads", input.threadId);
+  const senderThreadRef = doc(
+    dbClient,
+    "users",
+    input.senderId,
+    "threads",
+    input.threadId,
+  );
   const threadSnapshot = await getDoc(threadRef);
   if (!threadSnapshot.exists()) {
     throw new Error("Message thread not found.");
@@ -329,24 +388,61 @@ export async function sendMessageToThread(input: {
     throw new Error("You do not have access to this thread.");
   }
 
-  const messageRef = doc(collection(dbClient, "threads", input.threadId, "messages"));
+  const participants = (threadSnapshot.data().participants ?? {}) as Record<
+    string,
+    { displayName?: string; photoURL?: string | null }
+  >;
+  const otherUserId =
+    participantIds.find((participantId) => participantId !== input.senderId) ??
+    input.senderId;
+  const otherThreadRef = doc(
+    dbClient,
+    "users",
+    otherUserId,
+    "threads",
+    input.threadId,
+  );
+
+  const messageRef = doc(
+    collection(dbClient, "threads", input.threadId, "messages"),
+  );
   const batch = writeBatch(dbClient);
-
-  batch.set(messageRef, {
-    threadId: input.threadId,
-    senderId: input.senderId,
-    senderDisplayName: input.senderDisplayName,
-    text: trimmedText,
-    createdAt: serverTimestamp(),
-  });
-
-  batch.update(threadRef, {
+  const summaryUpdates = {
     lastMessageText: trimmedText,
     lastMessageSenderId: input.senderId,
     lastMessageAt: serverTimestamp(),
     [`readBy.${input.senderId}`]: serverTimestamp(),
     updatedAt: serverTimestamp(),
+  };
+
+  batch.set(messageRef, {
+    threadId: input.threadId,
+    senderId: input.senderId,
+    senderDisplayName: input.senderDisplayName,
+    participantIds,
+    text: trimmedText,
+    createdAt: serverTimestamp(),
   });
+
+  batch.update(threadRef, summaryUpdates);
+  batch.set(
+    senderThreadRef,
+    {
+      participantIds: participantIds.sort(),
+      participants,
+      ...summaryUpdates,
+    },
+    { merge: true },
+  );
+  batch.set(
+    otherThreadRef,
+    {
+      participantIds: participantIds.sort(),
+      participants,
+      ...summaryUpdates,
+    },
+    { merge: true },
+  );
 
   await batch.commit();
 }
@@ -354,8 +450,15 @@ export async function sendMessageToThread(input: {
 export async function markThreadAsRead(threadId: string, userId: string) {
   const dbClient = requireDb();
   const threadRef = doc(dbClient, "threads", threadId);
-  await updateDoc(threadRef, {
+  const userThreadRef = doc(dbClient, "users", userId, "threads", threadId);
+  const batch = writeBatch(dbClient);
+  const readUpdates = {
     [`readBy.${userId}`]: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  });
+  };
+
+  batch.set(userThreadRef, readUpdates, { merge: true });
+  batch.update(threadRef, readUpdates);
+
+  await batch.commit();
 }

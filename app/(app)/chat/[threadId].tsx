@@ -1,9 +1,13 @@
+import { useHeaderHeight } from "@react-navigation/elements";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   KeyboardAvoidingView,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Platform,
   Pressable,
   StyleSheet,
@@ -18,13 +22,111 @@ import { useAuth } from "@/src/hooks/useAuth";
 import { ChatMessage, MessageThreadSummary } from "@/src/models/types";
 import {
   markThreadAsRead,
+  fetchOlderThreadMessages,
+  MessagePage,
   sendMessageToThread,
   subscribeToThreadMessages,
   subscribeToThreadSummary,
 } from "@/src/services/firebase/messages";
 import { colors } from "@/src/theme/colors";
 
+const MESSAGE_PAGE_SIZE = 25;
+const READ_AT_BOTTOM_THRESHOLD = 32;
+const LOAD_OLDER_AT_TOP_THRESHOLD = 80;
+
+type MessageRowProps = {
+  item: ChatMessage;
+  currentUserId: string;
+};
+
+function sameMessage(a: ChatMessage, b: ChatMessage) {
+  return (
+    a.id === b.id &&
+    a.threadId === b.threadId &&
+    a.senderId === b.senderId &&
+    a.senderDisplayName === b.senderDisplayName &&
+    a.text === b.text &&
+    a.createdAt === b.createdAt
+  );
+}
+
+function preserveStableMessages(
+  previousMessages: ChatMessage[],
+  nextMessages: ChatMessage[],
+) {
+  if (previousMessages.length === 0) {
+    return nextMessages;
+  }
+
+  const previousById = new Map(
+    previousMessages.map((message) => [message.id, message]),
+  );
+
+  let changed = previousMessages.length !== nextMessages.length;
+  const stableMessages = nextMessages.map((message, index) => {
+    const previous = previousById.get(message.id);
+    if (previous && sameMessage(previous, message)) {
+      if (previousMessages[index] !== previous) {
+        changed = true;
+      }
+      return previous;
+    }
+
+    changed = true;
+    return message;
+  });
+
+  return changed ? stableMessages : previousMessages;
+}
+
+function messageMillis(message: ChatMessage) {
+  const parsed = Date.parse(message.createdAt);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+const MessageRow = memo(
+  function MessageRow({ item, currentUserId }: MessageRowProps) {
+    const isCurrentUser = item.senderId === currentUserId;
+
+    return (
+      <View
+        style={[
+          styles.messageRow,
+          isCurrentUser
+            ? styles.messageRowCurrentUser
+            : styles.messageRowOther,
+        ]}
+      >
+        <View
+          style={[
+            styles.messageBubble,
+            isCurrentUser
+              ? styles.messageBubbleCurrentUser
+              : styles.messageBubbleOther,
+          ]}
+        >
+          {!isCurrentUser ? (
+            <Text style={styles.messageSender}>{item.senderDisplayName}</Text>
+          ) : null}
+          <Text
+            style={[
+              styles.messageText,
+              isCurrentUser && styles.messageTextCurrentUser,
+            ]}
+          >
+            {item.text}
+          </Text>
+        </View>
+      </View>
+    );
+  },
+  (previous, next) =>
+    previous.currentUserId === next.currentUserId &&
+    sameMessage(previous.item, next.item),
+);
+
 export default function ChatThreadScreen() {
+  const headerHeight = useHeaderHeight();
   const { threadId, otherUserName } = useLocalSearchParams<{
     threadId: string;
     otherUserName?: string;
@@ -34,19 +136,42 @@ export default function ChatThreadScreen() {
   const [thread, setThread] = useState<MessageThreadSummary | null>(null);
   const [draft, setDraft] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
   const [isLoadingThread, setIsLoadingThread] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
 
   const listRef = useRef<FlatList<ChatMessage>>(null);
   const lastReadMessageIdRef = useRef<string | null>(null);
+  const currentUserIdRef = useRef("");
+  const listContentHeightRef = useRef(0);
+  const listViewportHeightRef = useRef(0);
+  const listScrollOffsetRef = useRef(0);
+  const messagesRef = useRef<ChatMessage[]>([]);
+  const hasOlderMessagesRef = useRef(false);
+  const hasLoadedOlderMessagesRef = useRef(false);
+  const isLoadingOlderMessagesRef = useRef(false);
+  const oldestMessageCursorRef = useRef<MessagePage["oldestCursor"]>(null);
+  const shouldScrollToBottomRef = useRef(true);
+  const threadIdRef = useRef<string | null>(null);
 
   const currentUserId = user?.uid ?? "";
+  currentUserIdRef.current = currentUserId;
+  threadIdRef.current = threadId || null;
   const currentDisplayName =
     profile?.displayName ?? user?.displayName ?? "Equippd User";
 
   const title =
     thread?.otherParticipant.displayName ??
     (typeof otherUserName === "string" ? otherUserName : "Chat");
+
+  const isListAtBottom = useCallback(() => {
+    const distanceFromBottom =
+      listContentHeightRef.current -
+      listViewportHeightRef.current -
+      listScrollOffsetRef.current;
+
+    return distanceFromBottom <= READ_AT_BOTTOM_THRESHOLD;
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -58,6 +183,14 @@ export default function ChatThreadScreen() {
 
       setIsLoadingThread(true);
       setIsLoadingMessages(true);
+      setIsLoadingOlderMessages(false);
+      hasOlderMessagesRef.current = false;
+      hasLoadedOlderMessagesRef.current = false;
+      isLoadingOlderMessagesRef.current = false;
+      oldestMessageCursorRef.current = null;
+      shouldScrollToBottomRef.current = true;
+      messagesRef.current = [];
+      setMessages([]);
 
       const unsubscribeThread = subscribeToThreadSummary(
         threadId,
@@ -73,23 +206,39 @@ export default function ChatThreadScreen() {
 
       const unsubscribeMessages = subscribeToThreadMessages(
         threadId,
+        MESSAGE_PAGE_SIZE,
         (nextMessages) => {
-          setMessages(nextMessages);
-          setIsLoadingMessages(false);
-
-          const latestMessage = nextMessages[nextMessages.length - 1];
-          if (!latestMessage || latestMessage.senderId === currentUserId) {
-            return;
-          }
-
-          if (lastReadMessageIdRef.current === latestMessage.id) {
-            return;
-          }
-
-          lastReadMessageIdRef.current = latestMessage.id;
-          markThreadAsRead(threadId, currentUserId).catch(() => {
-            lastReadMessageIdRef.current = null;
+          setMessages((previousMessages) => {
+            shouldScrollToBottomRef.current =
+              previousMessages.length === 0 ||
+              isListAtBottom();
+            const nextMessageIds = new Set(
+              nextMessages.map((message) => message.id),
+            );
+            const oldestRecentMessageMillis = nextMessages[0]
+              ? messageMillis(nextMessages[0])
+              : 0;
+            const olderLoadedMessages = hasLoadedOlderMessagesRef.current
+              ? previousMessages.filter(
+                  (message) =>
+                    !nextMessageIds.has(message.id) &&
+                    messageMillis(message) < oldestRecentMessageMillis,
+                )
+              : [];
+            const stableMessages = preserveStableMessages(previousMessages, [
+              ...olderLoadedMessages,
+              ...nextMessages,
+            ]);
+            messagesRef.current = stableMessages;
+            return stableMessages;
           });
+          setIsLoadingMessages(false);
+        },
+        (page) => {
+          if (!hasLoadedOlderMessagesRef.current) {
+            oldestMessageCursorRef.current = page.oldestCursor;
+            hasOlderMessagesRef.current = page.hasMore;
+          }
         },
         () => {
           setIsLoadingMessages(false);
@@ -100,7 +249,7 @@ export default function ChatThreadScreen() {
         unsubscribeThread();
         unsubscribeMessages();
       };
-    }, [currentUserId, threadId]),
+    }, [currentUserId, isListAtBottom, threadId]),
   );
 
   const canSend = useMemo(
@@ -122,42 +271,138 @@ export default function ChatThreadScreen() {
         text: draft,
       });
       setDraft("");
+    } catch {
+      Alert.alert(
+        "Message failed",
+        "We couldn't send this message. Please check your connection and try again.",
+      );
     } finally {
       setIsSending(false);
     }
   }, [canSend, currentDisplayName, currentUserId, draft, threadId]);
 
-  const renderMessage = ({ item }: { item: ChatMessage }) => {
-    const isCurrentUser = item.senderId === currentUserId;
+  const keyExtractor = useCallback((item: ChatMessage) => item.id, []);
 
-    return (
-      <View
-        style={[
-          styles.messageRow,
-          isCurrentUser ? styles.messageRowCurrentUser : styles.messageRowOther,
-        ]}
-      >
-        <View
-          style={[
-            styles.messageBubble,
-            isCurrentUser ? styles.messageBubbleCurrentUser : styles.messageBubbleOther,
-          ]}
-        >
-          {!isCurrentUser ? (
-            <Text style={styles.messageSender}>{item.senderDisplayName}</Text>
-          ) : null}
-          <Text
-            style={[
-              styles.messageText,
-              isCurrentUser && styles.messageTextCurrentUser,
-            ]}
-          >
-            {item.text}
-          </Text>
-        </View>
-      </View>
-    );
-  };
+  const renderMessage = useCallback(
+    ({ item }: { item: ChatMessage }) => (
+      <MessageRow item={item} currentUserId={currentUserId} />
+    ),
+    [currentUserId],
+  );
+
+  const loadOlderMessages = useCallback(async () => {
+    const activeThreadId = threadIdRef.current;
+    const cursor = oldestMessageCursorRef.current;
+
+    if (
+      !activeThreadId ||
+      !cursor ||
+      !hasOlderMessagesRef.current ||
+      isLoadingOlderMessagesRef.current
+    ) {
+      return;
+    }
+
+    isLoadingOlderMessagesRef.current = true;
+    setIsLoadingOlderMessages(true);
+    try {
+      const page = await fetchOlderThreadMessages(
+        activeThreadId,
+        cursor,
+        MESSAGE_PAGE_SIZE,
+      );
+      hasLoadedOlderMessagesRef.current = true;
+      oldestMessageCursorRef.current = page.oldestCursor;
+      hasOlderMessagesRef.current = page.hasMore;
+
+      setMessages((previousMessages) => {
+        const existingIds = new Set(
+          previousMessages.map((message) => message.id),
+        );
+        const olderMessages = page.messages.filter(
+          (message) => !existingIds.has(message.id),
+        );
+        const stableMessages = preserveStableMessages(previousMessages, [
+          ...olderMessages,
+          ...previousMessages,
+        ]);
+        messagesRef.current = stableMessages;
+        return stableMessages;
+      });
+    } catch {
+      // Older history is nice-to-have; keep the current conversation usable.
+    } finally {
+      isLoadingOlderMessagesRef.current = false;
+      setIsLoadingOlderMessages(false);
+    }
+  }, []);
+
+  const markLatestIncomingMessageAsRead = useCallback(() => {
+    const activeThreadId = threadIdRef.current;
+    const activeUserId = currentUserIdRef.current;
+
+    if (!activeThreadId || !activeUserId) {
+      return;
+    }
+
+    const latestIncomingMessage = messagesRef.current
+      .slice()
+      .reverse()
+      .find((message) => message.senderId !== activeUserId);
+
+    if (
+      !latestIncomingMessage ||
+      lastReadMessageIdRef.current === latestIncomingMessage.id
+    ) {
+      return;
+    }
+
+    lastReadMessageIdRef.current = latestIncomingMessage.id;
+    markThreadAsRead(activeThreadId, activeUserId).catch(() => {
+      lastReadMessageIdRef.current = null;
+    });
+  }, []);
+
+  const markReadIfAtBottom = useCallback(() => {
+    if (isListAtBottom()) {
+      markLatestIncomingMessageAsRead();
+    }
+  }, [isListAtBottom, markLatestIncomingMessageAsRead]);
+
+  const handleListLayout = useCallback(
+    (height: number) => {
+      listViewportHeightRef.current = height;
+      markReadIfAtBottom();
+    },
+    [markReadIfAtBottom],
+  );
+
+  const handleContentSizeChange = useCallback(
+    (_width: number, height: number) => {
+      listContentHeightRef.current = height;
+      if (shouldScrollToBottomRef.current) {
+        listRef.current?.scrollToEnd({ animated: true });
+        shouldScrollToBottomRef.current = false;
+      }
+      requestAnimationFrame(markReadIfAtBottom);
+    },
+    [markReadIfAtBottom],
+  );
+
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset, contentSize, layoutMeasurement } =
+        event.nativeEvent;
+      listScrollOffsetRef.current = contentOffset.y;
+      listContentHeightRef.current = contentSize.height;
+      listViewportHeightRef.current = layoutMeasurement.height;
+      if (contentOffset.y <= LOAD_OLDER_AT_TOP_THRESHOLD) {
+        loadOlderMessages();
+      }
+      markReadIfAtBottom();
+    },
+    [loadOlderMessages, markReadIfAtBottom],
+  );
 
   if (!threadId) {
     return (
@@ -175,37 +420,48 @@ export default function ChatThreadScreen() {
   const isLoading = isLoadingThread || isLoadingMessages;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["left", "right", "bottom"]}>
+    <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.select({ ios: "padding", android: "height" })}
+        keyboardVerticalOffset={headerHeight}
       >
         <View style={styles.header}>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>Direct messages update in real time.</Text>
         </View>
 
         {isLoading ? (
           <View style={styles.loadingState}>
             <ActivityIndicator color={colors.accent} />
           </View>
-        ) : messages.length === 0 ? (
-          <View style={styles.emptyWrapper}>
-            <EmptyState
-              title="No messages yet"
-              description="Send a message to start this conversation."
-            />
-          </View>
         ) : (
           <FlatList
             ref={listRef}
             data={messages}
-            keyExtractor={(item) => item.id}
+            keyExtractor={keyExtractor}
             renderItem={renderMessage}
             contentContainerStyle={styles.messagesContent}
-            onContentSizeChange={() => {
-              listRef.current?.scrollToEnd({ animated: true });
-            }}
+            initialNumToRender={20}
+            ListHeaderComponent={
+              isLoadingOlderMessages ? (
+                <View style={styles.olderMessagesLoader}>
+                  <ActivityIndicator color={colors.accent} size="small" />
+                </View>
+              ) : null
+            }
+            maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
+            maxToRenderPerBatch={10}
+            removeClippedSubviews={Platform.OS === "android"}
+            updateCellsBatchingPeriod={50}
+            windowSize={7}
+            onContentSizeChange={handleContentSizeChange}
+            onEndReached={markLatestIncomingMessageAsRead}
+            onEndReachedThreshold={0.1}
+            onLayout={(event) =>
+              handleListLayout(event.nativeEvent.layout.height)
+            }
+            onScroll={handleScroll}
+            scrollEventThrottle={100}
           />
         )}
 
@@ -213,7 +469,7 @@ export default function ChatThreadScreen() {
           <TextInput
             value={draft}
             onChangeText={setDraft}
-            placeholder="Type your message"
+            placeholder="Start conversation..."
             placeholderTextColor={colors.mutedText}
             style={styles.input}
             multiline
@@ -228,7 +484,9 @@ export default function ChatThreadScreen() {
               pressed && canSend && styles.sendButtonPressed,
             ]}
           >
-            <Text style={styles.sendButtonText}>{isSending ? "..." : "Send"}</Text>
+            <Text style={styles.sendButtonText}>
+              {isSending ? "..." : "Send"}
+            </Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -243,7 +501,9 @@ const styles = StyleSheet.create({
   },
   keyboardContainer: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
     gap: 12,
   },
   container: {
@@ -267,13 +527,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  emptyWrapper: {
-    flex: 1,
-    justifyContent: "center",
+  olderMessagesLoader: {
+    alignItems: "center",
+    paddingVertical: 8,
   },
   messagesContent: {
     gap: 10,
-    paddingVertical: 8,
+    paddingTop: 8,
   },
   messageRow: {
     width: "100%",
