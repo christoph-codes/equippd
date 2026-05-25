@@ -68,6 +68,8 @@ EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_HOST=127.0.0.1
 EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_PORT=9199
 ```
 
+For EAS builds, define the same `EXPO_PUBLIC_*` values in your EAS environment so `app.config.ts` can forward them into the app build. For production, set `EXPO_PUBLIC_USE_FIREBASE_EMULATORS=false`.
+
 Firestore rules draft is in:
 
 - `/firebase/firestore.rules`

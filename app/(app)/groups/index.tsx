@@ -466,13 +466,13 @@ export default function GroupsScreen() {
                 );
               }
             }}
-            placeholder="The Brothers"
+            placeholder="Community Study Group"
           />
           <TextInput
             label="Slug"
             value={groupSlug}
             onChangeText={setGroupSlug}
-            placeholder="the-brothers"
+            placeholder="community-study-group"
             autoCapitalize="none"
             autoCorrect={false}
           />

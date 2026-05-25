@@ -1,12 +1,12 @@
 export const brand = {
   appName: "Equippd",
-  authKicker: "Built for brotherhood",
+  authKicker: "Unity in Christ",
   loginTitle: "Welcome back",
   signupTitle: "Create your account",
   loginSubtitle:
-    "Strengthen your walk through studies, notes, and brotherhood.",
+    "Grow in truth. Stand firm in faith. Live equipped.",
   signupSubtitle:
-    "Join Equippd to strengthen your walk through community and studies.",
+    "Join Equippd to grow in unity, faith, and maturity in Christ.",
 };
 
 export const brandAssets = {
