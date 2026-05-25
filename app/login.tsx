@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Easing, StyleSheet, Text } from "react-native";
 
 import { BrandLogo } from "@/src/components/brand/BrandLogo";
 import { Button } from "@/src/components/ui/Button";
@@ -9,6 +9,7 @@ import { TextInput } from "@/src/components/ui/TextInput";
 import { useAuth } from "@/src/hooks/useAuth";
 import { brand } from "@/src/theme/brand";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -17,6 +18,41 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const heroOpacity = useRef(new Animated.Value(0)).current;
+  const heroTranslate = useRef(new Animated.Value(10)).current;
+  const cardOpacity = useRef(new Animated.Value(0)).current;
+  const cardTranslate = useRef(new Animated.Value(16)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(heroOpacity, {
+        toValue: 1,
+        duration: 320,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(heroTranslate, {
+        toValue: 0,
+        duration: 360,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardOpacity, {
+        toValue: 1,
+        duration: 380,
+        delay: 70,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardTranslate, {
+        toValue: 0,
+        duration: 420,
+        delay: 70,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [cardOpacity, cardTranslate, heroOpacity, heroTranslate]);
 
   async function onLogin() {
     setError("");
@@ -32,9 +68,21 @@ export default function LoginScreen() {
 
   return (
     <ScreenContainer edges={["top", "left", "right"]} centered>
-      <BrandLogo width={160} />
-      <Text style={styles.subtitle}>{brand.loginSubtitle}</Text>
-      <View style={styles.form}>
+      <Animated.View
+        style={[
+          styles.hero,
+          { opacity: heroOpacity, transform: [{ translateY: heroTranslate }] },
+        ]}
+      >
+        <BrandLogo width={180} />
+        <Text style={styles.subtitle}>{brand.loginSubtitle}</Text>
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.formCard,
+          { opacity: cardOpacity, transform: [{ translateY: cardTranslate }] },
+        ]}
+      >
         <TextInput
           autoCapitalize="none"
           keyboardType="email-address"
@@ -59,25 +107,44 @@ export default function LoginScreen() {
           onPress={() => router.push("/signup")}
           variant="ghost"
         />
-      </View>
+      </Animated.View>
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  subtitle: {
-    fontSize: 14,
-    color: colors.mutedText,
-    textAlign: "left",
-    alignSelf: "flex-start",
-  },
-  form: {
+  hero: {
     width: "100%",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 2,
+  },
+  kicker: {
+    ...typography.labelCaps,
+    color: colors.accent,
+  },
+  title: {
+    ...typography.title,
+    color: colors.text,
+    textAlign: "center",
+  },
+  subtitle: {
+    ...typography.bodySmall,
+    color: colors.mutedText,
+    textAlign: "center",
+    maxWidth: 320,
+  },
+  formCard: {
+    width: "100%",
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 16,
     gap: 12,
   },
   error: {
     color: colors.danger,
-    fontSize: 12,
-    marginTop: 8,
+    ...typography.caption,
   },
 });

@@ -29,6 +29,7 @@ import {
   subscribeToThreadSummary,
 } from "@/src/services/firebase/messages";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 const MESSAGE_PAGE_SIZE = 25;
 const READ_AT_BOTTOM_THRESHOLD = 32;
@@ -512,8 +513,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: 26,
-    fontWeight: "800",
+    ...typography.title,
   },
   subtitle: {
     color: colors.mutedText,

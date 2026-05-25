@@ -22,6 +22,7 @@ import { Note } from "@/src/models/types";
 import { deleteNote, saveNote } from "@/src/services/firebase/firestore";
 import { fetchAllNotes } from "@/src/services/firebase/notes";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 const PERSONAL_GROUP_SLUG = "personal";
 const GENERAL_STUDY_SLUG = "general";
@@ -386,8 +387,7 @@ const styles = StyleSheet.create({
   },
   confirmTitle: {
     color: colors.text,
-    fontSize: 20,
-    fontWeight: "800",
+    ...typography.sectionTitle,
   },
   confirmBody: {
     color: colors.mutedText,

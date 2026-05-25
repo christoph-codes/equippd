@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Card } from "@/src/components/ui/Card";
 import { Study, StudyEngagement } from "@/src/models/types";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type Props = {
   study: Study;
@@ -44,8 +45,7 @@ export function StudyCard({ study, engagement, isTopEngaged, onPress }: Props) {
 const styles = StyleSheet.create({
   title: {
     color: colors.text,
-    fontSize: 16,
-    fontWeight: "700",
+    ...typography.sectionTitle,
   },
   meta: {
     color: colors.accent,

@@ -1,11 +1,12 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  Animated,
+  Easing,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
-  View,
 } from "react-native";
 
 import { BrandLogo } from "@/src/components/brand/BrandLogo";
@@ -15,6 +16,7 @@ import { TextInput } from "@/src/components/ui/TextInput";
 import { useAuth } from "@/src/hooks/useAuth";
 import { brand } from "@/src/theme/brand";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -24,6 +26,41 @@ export default function SignupScreen() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const heroOpacity = useRef(new Animated.Value(0)).current;
+  const heroTranslate = useRef(new Animated.Value(10)).current;
+  const cardOpacity = useRef(new Animated.Value(0)).current;
+  const cardTranslate = useRef(new Animated.Value(16)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(heroOpacity, {
+        toValue: 1,
+        duration: 320,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(heroTranslate, {
+        toValue: 0,
+        duration: 360,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardOpacity, {
+        toValue: 1,
+        duration: 380,
+        delay: 70,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardTranslate, {
+        toValue: 0,
+        duration: 420,
+        delay: 70,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [cardOpacity, cardTranslate, heroOpacity, heroTranslate]);
 
   async function onSignup() {
     setError("");
@@ -42,12 +79,28 @@ export default function SignupScreen() {
       style={styles.keyboardContainer}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScreenContainer edges={["top", "left", "right"]}>
-        <View style={styles.logoWrap}>
-          <BrandLogo width={160} />
-        </View>
-        <Text style={styles.subtitle}>{brand.signupSubtitle}</Text>
-        <View style={styles.form}>
+      <ScreenContainer edges={["top", "left", "right"]} centered>
+        <Animated.View
+          style={[
+            styles.hero,
+            {
+              opacity: heroOpacity,
+              transform: [{ translateY: heroTranslate }],
+            },
+          ]}
+        >
+          <BrandLogo width={180} />
+          <Text style={styles.subtitle}>{brand.signupSubtitle}</Text>
+        </Animated.View>
+        <Animated.View
+          style={[
+            styles.formCard,
+            {
+              opacity: cardOpacity,
+              transform: [{ translateY: cardTranslate }],
+            },
+          ]}
+        >
           <TextInput
             label="Display name"
             onChangeText={setDisplayName}
@@ -77,7 +130,7 @@ export default function SignupScreen() {
             onPress={() => router.replace("/login")}
             variant="ghost"
           />
-        </View>
+        </Animated.View>
       </ScreenContainer>
     </KeyboardAvoidingView>
   );
@@ -87,23 +140,38 @@ const styles = StyleSheet.create({
   keyboardContainer: {
     flex: 1,
   },
-  logoWrap: {
+  hero: {
+    width: "100%",
     alignItems: "center",
-    marginTop: 24,
+    gap: 10,
+    marginBottom: 2,
+  },
+  kicker: {
+    ...typography.labelCaps,
+    color: colors.accent,
+  },
+  title: {
+    ...typography.title,
+    color: colors.text,
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 14,
+    ...typography.bodySmall,
     color: colors.mutedText,
-    textAlign: "left",
-    alignSelf: "flex-start",
+    textAlign: "center",
+    maxWidth: 320,
   },
-  form: {
+  formCard: {
     width: "100%",
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 16,
     gap: 12,
   },
   error: {
     color: colors.danger,
-    fontSize: 12,
-    marginTop: 8,
+    ...typography.caption,
   },
 });

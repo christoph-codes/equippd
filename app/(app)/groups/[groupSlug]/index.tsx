@@ -29,6 +29,7 @@ import {
 import { fetchGroupBySlug } from "@/src/services/firebase/groups";
 import { fetchNotesByGroup } from "@/src/services/firebase/notes";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 export default function GroupDetailScreen() {
   const params = useLocalSearchParams<{ groupSlug: string }>();
@@ -54,9 +55,9 @@ export default function GroupDetailScreen() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: group?.name ?? "Group",
+      headerTitle: (group?.name ?? "GROUP").toUpperCase(),
       headerTitleAlign: "center",
-      headerBackTitle: "Groups",
+      headerBackTitle: "GROUPS",
       headerBackButtonDisplayMode: "minimal",
     });
   }, [group?.name, navigation]);
@@ -406,8 +407,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: "700",
+    ...typography.sectionTitle,
     color: colors.text,
   },
   closeButton: {

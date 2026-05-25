@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  Pressable,
-  Alert,
-  ScrollView,
-} from "react-native";
 import { SongCard } from "@/src/components/cards/SongCard";
 import { Button } from "@/src/components/ui/Button";
 import { Modal } from "@/src/components/ui/Modal";
 import { TextInput } from "@/src/components/ui/TextInput";
-import { colors } from "@/src/theme/colors";
 import { Song } from "@/src/models/types";
 import {
   approveSong,
-  rejectSong,
   deleteSong,
+  rejectSong,
   updateSongLinks,
 } from "@/src/services/firebase/firestore";
+import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 interface AdminSongManagementProps {
   pendingSongs: Song[];
@@ -256,8 +257,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "700",
+    ...typography.sectionTitle,
     color: colors.text,
   },
   refreshButton: {
@@ -282,10 +282,8 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   modalTitle: {
-    fontSize: 12,
-    fontWeight: "700",
+    ...typography.labelCaps,
     color: colors.mutedText,
-    letterSpacing: 1,
   },
   modalSongName: {
     fontSize: 14,

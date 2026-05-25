@@ -25,6 +25,7 @@ import {
   subscribeToDirectThreads,
 } from "@/src/services/firebase/messages";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type Candidate = {
   userId: string;
@@ -363,12 +364,11 @@ const styles = StyleSheet.create({
   },
   threadName: {
     color: colors.text,
-    fontSize: 16,
-    fontWeight: "700",
+    ...typography.button,
   },
   preview: {
     color: colors.mutedText,
-    fontSize: 13,
+    ...typography.bodySmall,
   },
   previewUnread: {
     color: colors.text,
@@ -414,10 +414,7 @@ const styles = StyleSheet.create({
   },
   pickerTitle: {
     color: colors.mutedText,
-    fontSize: 13,
-    fontWeight: "700",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
+    ...typography.labelCaps,
   },
   searchInput: {
     borderWidth: 1,
@@ -434,7 +431,7 @@ const styles = StyleSheet.create({
   },
   pickerEmpty: {
     color: colors.mutedText,
-    fontSize: 14,
+    ...typography.bodySmall,
   },
   pickerList: {
     flexShrink: 1,

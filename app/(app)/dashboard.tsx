@@ -1,7 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { GroupCard } from "@/src/components/cards/GroupCard";
 import { NoteCard } from "@/src/components/cards/NoteCard";
@@ -18,6 +24,7 @@ import { getMusicItemCount } from "@/src/services/content/mdx";
 import { fetchAccessibleGroups } from "@/src/services/firebase/groups";
 import { fetchRecentNotes } from "@/src/services/firebase/notes";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 const featuredMusicCount = getMusicItemCount();
 
@@ -249,19 +256,15 @@ const styles = StyleSheet.create({
   },
   heroEyebrow: {
     color: colors.accent,
-    fontSize: 12,
-    fontWeight: "800",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
+    ...typography.labelCaps,
   },
   heroTitle: {
     color: colors.text,
-    fontSize: 22,
-    fontWeight: "800",
+    ...typography.title,
   },
   heroDescription: {
     color: colors.mutedText,
-    lineHeight: 20,
+    ...typography.bodySmall,
     marginTop: 4,
   },
   heroStats: {
@@ -279,13 +282,11 @@ const styles = StyleSheet.create({
   },
   statValue: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: "800",
+    ...typography.sectionTitle,
   },
   statLabel: {
     color: colors.mutedText,
-    fontSize: 12,
-    fontWeight: "600",
+    ...typography.caption,
   },
   quickLinks: {
     gap: 10,
@@ -310,11 +311,10 @@ const styles = StyleSheet.create({
   },
   quickLinkTitle: {
     color: colors.text,
-    fontSize: 15,
-    fontWeight: "700",
+    ...typography.button,
   },
   quickLinkDescription: {
     color: colors.mutedText,
-    lineHeight: 18,
+    ...typography.bodySmall,
   },
 });

@@ -1,7 +1,8 @@
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from "react-native";
 
-import { Card } from '@/src/components/ui/Card';
-import { colors } from '@/src/theme/colors';
+import { Card } from "@/src/components/ui/Card";
+import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type Props = {
   title: string;
@@ -20,8 +21,7 @@ export function EmptyState({ title, description }: Props) {
 const styles = StyleSheet.create({
   title: {
     color: colors.text,
-    fontSize: 16,
-    fontWeight: '700',
+    ...typography.sectionTitle,
   },
   description: {
     color: colors.mutedText,

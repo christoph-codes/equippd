@@ -8,6 +8,7 @@ import { BrandHeaderTitle } from "@/src/components/brand/BrandLogo";
 import { useAuth } from "@/src/hooks/useAuth";
 import { subscribeToDirectThreads } from "@/src/services/firebase/messages";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 export default function AppLayout() {
   const { user } = useAuth();
@@ -43,7 +44,7 @@ export default function AppLayout() {
         tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.mutedText,
         tabBarLabelStyle: {
-          fontWeight: "700",
+          ...typography.labelCaps,
         },
         tabBarStyle: {
           backgroundColor: colors.surface,
@@ -55,8 +56,8 @@ export default function AppLayout() {
       <Tabs.Screen
         name="dashboard"
         options={{
-          headerTitle: () => <BrandHeaderTitle title="Home" />,
-          title: "Home",
+          headerTitle: () => <BrandHeaderTitle title="HOME" />,
+          title: "HOME",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" color={color} size={size} />
           ),
@@ -68,8 +69,8 @@ export default function AppLayout() {
           const focusedRoute = getFocusedRouteNameFromRoute(route) ?? "index";
 
           return {
-            headerTitle: () => <BrandHeaderTitle title="Groups" />,
-            title: "Groups",
+            headerTitle: () => <BrandHeaderTitle title="GROUPS" />,
+            title: "GROUPS",
             headerShown: focusedRoute === "index",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="people-outline" color={color} size={size} />
@@ -80,8 +81,8 @@ export default function AppLayout() {
       <Tabs.Screen
         name="notes/index"
         options={{
-          headerTitle: () => <BrandHeaderTitle title="Notes" />,
-          title: "Notes",
+          headerTitle: () => <BrandHeaderTitle title="NOTES" />,
+          title: "NOTES",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="document-text-outline" color={color} size={size} />
           ),
@@ -90,8 +91,8 @@ export default function AppLayout() {
       <Tabs.Screen
         name="messages"
         options={{
-          headerTitle: () => <BrandHeaderTitle title="Messages" />,
-          title: "Messages",
+          headerTitle: () => <BrandHeaderTitle title="MESSAGES" />,
+          title: "MESSAGES",
           tabBarIcon: ({ color, size }) => (
             <View style={styles.messagesIcon}>
               <Ionicons name="chatbubbles-outline" color={color} size={size} />
@@ -109,8 +110,8 @@ export default function AppLayout() {
       <Tabs.Screen
         name="music"
         options={{
-          headerTitle: () => <BrandHeaderTitle title="Music" />,
-          title: "Music",
+          headerTitle: () => <BrandHeaderTitle title="MUSIC" />,
+          title: "MUSIC",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="musical-notes-outline" color={color} size={size} />
           ),
@@ -119,8 +120,8 @@ export default function AppLayout() {
       <Tabs.Screen
         name="account"
         options={{
-          headerTitle: () => <BrandHeaderTitle title="Account" />,
-          title: "Account",
+          headerTitle: () => <BrandHeaderTitle title="ACCOUNT" />,
+          title: "ACCOUNT",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-circle-outline" color={color} size={size} />
           ),
@@ -128,16 +129,16 @@ export default function AppLayout() {
       />
       <Tabs.Screen
         name="notes/[noteId]"
-        options={{ href: null, title: "Note" }}
+        options={{ href: null, title: "NOTE" }}
       />
       <Tabs.Screen
         name="chat/[threadId]"
-        options={{ href: null, title: "Chat" }}
+        options={{ href: null, title: "CHAT" }}
       />
-      <Tabs.Screen name="shop" options={{ href: null, title: "Shop" }} />
+      <Tabs.Screen name="shop" options={{ href: null, title: "SHOP" }} />
       <Tabs.Screen
         name="settings"
-        options={{ href: null, title: "Settings" }}
+        options={{ href: null, title: "SETTINGS" }}
       />
     </Tabs>
   );

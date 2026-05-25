@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
 import { brandAssets } from "@/src/theme/brand";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type Props = {
   width?: number;
@@ -90,8 +91,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: colors.text,
-    fontSize: 19,
-    fontWeight: "800",
+    ...typography.sectionTitle,
   },
   headerTextRight: {
     textAlign: "right",

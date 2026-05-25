@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/src/components/ui/Button";
 import { Modal } from "@/src/components/ui/Modal";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type Selection = {
   start: number;
@@ -205,10 +206,7 @@ const styles = StyleSheet.create({
   },
   sheetTitle: {
     color: colors.mutedText,
-    fontSize: 13,
-    fontWeight: "700",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
+    ...typography.labelCaps,
   },
   titleBlock: {
     paddingBottom: 6,
@@ -243,9 +241,7 @@ const styles = StyleSheet.create({
   titleInput: {
     minHeight: 56,
     color: colors.text,
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: "800",
+    ...typography.title,
     paddingHorizontal: 0,
     paddingTop: 6,
     paddingBottom: 6,
@@ -254,9 +250,7 @@ const styles = StyleSheet.create({
   titleReadText: {
     minHeight: 56,
     color: colors.text,
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: "800",
+    ...typography.title,
     paddingTop: 6,
     paddingBottom: 6,
   },

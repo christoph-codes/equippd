@@ -32,6 +32,7 @@ import {
   requestGroupAccess,
 } from "@/src/services/firebase/groups";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 export default function GroupsScreen() {
   const router = useRouter();
@@ -526,17 +527,15 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: "700",
+    ...typography.sectionTitle,
   },
   meta: {
     color: colors.accent,
-    fontWeight: "600",
-    backgroundColor: "blue",
+    ...typography.caption,
   },
   description: {
     color: colors.mutedText,
-    lineHeight: 20,
+    ...typography.body,
   },
   requestActions: {
     flexDirection: "row",
@@ -556,8 +555,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     color: colors.accentText,
-    fontSize: 12,
-    fontWeight: "700",
+    ...typography.labelCaps,
   },
   requestSheet: {
     backgroundColor: colors.background,
@@ -569,10 +567,7 @@ const styles = StyleSheet.create({
   },
   requestTitle: {
     color: colors.mutedText,
-    fontSize: 13,
-    fontWeight: "700",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
+    ...typography.labelCaps,
   },
   requestList: {
     gap: 12,

@@ -1,5 +1,8 @@
 export const brand = {
   appName: "Equippd",
+  authKicker: "Built for brotherhood",
+  loginTitle: "Welcome back",
+  signupTitle: "Create your account",
   loginSubtitle:
     "Strengthen your walk through studies, notes, and brotherhood.",
   signupSubtitle:

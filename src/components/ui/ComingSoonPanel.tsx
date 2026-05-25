@@ -1,7 +1,8 @@
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from "react-native";
 
-import { Card } from '@/src/components/ui/Card';
-import { colors } from '@/src/theme/colors';
+import { Card } from "@/src/components/ui/Card";
+import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type Props = {
   title: string;
@@ -21,15 +22,14 @@ export function ComingSoonPanel({ title, description }: Props) {
 const styles = StyleSheet.create({
   badge: {
     color: colors.accent,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    textTransform: "uppercase",
     fontSize: 12,
     letterSpacing: 0.8,
   },
   title: {
     color: colors.text,
-    fontWeight: '700',
-    fontSize: 18,
+    ...typography.sectionTitle,
   },
   description: {
     color: colors.mutedText,

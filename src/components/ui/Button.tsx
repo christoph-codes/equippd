@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type Props = {
   label: string;
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.danger,
   },
   label: {
-    fontWeight: "700",
+    ...typography.button,
   },
   small: {
     minHeight: 32,
@@ -72,6 +73,7 @@ const styles = StyleSheet.create({
   },
   smallLabel: {
     fontSize: 14,
+    lineHeight: 18,
   },
   primaryLabel: {
     color: colors.accentText,

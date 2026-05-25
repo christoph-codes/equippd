@@ -1,21 +1,21 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Keyboard,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button } from "@/src/components/ui/Button";
 import { Modal } from "@/src/components/ui/Modal";
 import { TextInput } from "@/src/components/ui/TextInput";
-import { Button } from "@/src/components/ui/Button";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
+import React, { useState } from "react";
+import { Keyboard, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface SongSubmissionModalProps {
   visible: boolean;
   onRequestClose: () => void;
-  onSubmit: (title: string, artist: string, spotifyUrl?: string, appleMusicUrl?: string) => Promise<void>;
+  onSubmit: (
+    title: string,
+    artist: string,
+    spotifyUrl?: string,
+    appleMusicUrl?: string,
+  ) => Promise<void>;
   saving?: boolean;
 }
 
@@ -65,14 +65,16 @@ export function SongSubmissionModal({
         spotifyUrl.trim() || undefined,
         appleMusicUrl.trim() || undefined,
       );
-      
+
       setTitle("");
       setArtist("");
       setSpotifyUrl("");
       setAppleMusicUrl("");
       onRequestClose();
     } catch (err) {
-      setError((err as Error).message || "Failed to submit song. Please try again.");
+      setError(
+        (err as Error).message || "Failed to submit song. Please try again.",
+      );
     }
   };
 
@@ -93,7 +95,7 @@ export function SongSubmissionModal({
       showHandle
     >
       <Text style={styles.sheetTitle}>Submit a Song</Text>
-      
+
       <ScrollView style={styles.scrollView}>
         <View style={styles.form}>
           <TextInput
@@ -174,10 +176,7 @@ const styles = StyleSheet.create({
   },
   sheetTitle: {
     color: colors.mutedText,
-    fontSize: 13,
-    fontWeight: "700",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
+    ...typography.labelCaps,
     marginBottom: 12,
   },
   scrollView: {

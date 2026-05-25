@@ -4,6 +4,7 @@ import { Card } from "@/src/components/ui/Card";
 import { Note } from "@/src/models/types";
 import { formatDate } from "@/src/services/utils/helpers";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type Props = {
   note: Note;
@@ -95,8 +96,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: 16,
-    fontWeight: "700",
+    ...typography.sectionTitle,
   },
   date: {
     color: colors.mutedText,

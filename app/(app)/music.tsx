@@ -12,6 +12,7 @@ import {
   submitSong,
 } from "@/src/services/firebase/firestore";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
@@ -217,8 +218,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
+    ...typography.sectionTitle,
     color: colors.text,
     marginBottom: 12,
     marginTop: 8,

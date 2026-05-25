@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Card } from "@/src/components/ui/Card";
 import { Group } from "@/src/models/types";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 import { Ionicons } from "@expo/vector-icons";
 
 type Props = {
@@ -33,8 +34,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: "700",
+    ...typography.sectionTitle,
   },
   org: {
     color: colors.accent,

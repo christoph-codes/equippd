@@ -32,6 +32,7 @@ import { canAccessGroup } from "@/src/services/firebase/groups";
 import { fetchNotesWithUserInfo } from "@/src/services/firebase/notes";
 import { formatDate } from "@/src/services/utils/helpers";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type NoteWithUser = Note & {
   userDisplayName?: string;
@@ -682,8 +683,7 @@ const styles = StyleSheet.create({
   studyTitle: {
     flex: 1,
     color: colors.text,
-    fontSize: 24,
-    fontWeight: "700",
+    ...typography.title,
   },
   studyMeta: {
     color: colors.mutedText,
@@ -693,8 +693,7 @@ const styles = StyleSheet.create({
   },
   headerStudyTitle: {
     color: colors.text,
-    fontSize: 21,
-    fontWeight: "800",
+    ...typography.sectionTitle,
     width: "100%",
     flexShrink: 1,
     textAlign: "right",
@@ -812,8 +811,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: "700",
+    ...typography.sectionTitle,
   },
   modalClose: {
     color: colors.mutedText,

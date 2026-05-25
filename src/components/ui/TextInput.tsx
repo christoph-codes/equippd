@@ -1,6 +1,13 @@
-import { StyleSheet, Text, TextInput as RNTextInput, TextInputProps, View } from 'react-native';
+import {
+  TextInput as RNTextInput,
+  StyleSheet,
+  Text,
+  TextInputProps,
+  View,
+} from "react-native";
 
-import { colors } from '@/src/theme/colors';
+import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 
 type Props = TextInputProps & {
   label: string;
@@ -12,7 +19,11 @@ export function TextInput({ label, ...rest }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <RNTextInput placeholderTextColor={colors.mutedText} style={[styles.input, style]} {...inputProps} />
+      <RNTextInput
+        placeholderTextColor={colors.mutedText}
+        style={[styles.input, style]}
+        {...inputProps}
+      />
     </View>
   );
 }
@@ -23,10 +34,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: colors.mutedText,
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    ...typography.labelCaps,
   },
   input: {
     borderWidth: 1,
@@ -36,5 +44,6 @@ const styles = StyleSheet.create({
     minHeight: 44,
     color: colors.text,
     backgroundColor: colors.surface,
+    ...typography.body,
   },
 });

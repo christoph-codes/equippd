@@ -4,6 +4,8 @@ if (typeof global.Buffer === "undefined") {
   (global as unknown as Record<string, unknown>).Buffer = Buffer;
 }
 
+import { Rajdhani_700Bold } from "@expo-google-fonts/rajdhani";
+import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
 import { useEffect } from "react";
 
@@ -66,6 +68,14 @@ function RootGuard() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Rajdhani_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return <LoadingOverlay visible fullScreen />;
+  }
+
   return (
     <AuthProvider>
       <RootGuard />

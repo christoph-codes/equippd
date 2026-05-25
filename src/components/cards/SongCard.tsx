@@ -1,6 +1,7 @@
 import { UserIdentityRow } from "@/src/components/ui/UserIdentityRow";
 import { Song } from "@/src/models/types";
 import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import {
   Alert,
@@ -172,8 +173,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "600",
+    ...typography.sectionTitle,
     color: colors.text,
     flex: 1,
   },
