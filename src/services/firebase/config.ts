@@ -14,12 +14,33 @@ const extra = (Constants.expoConfig?.extra ?? {}) as Record<
   string | undefined
 >;
 
-function readConfigValue(key: keyof FirebaseConfig, envKey: string) {
-  return process.env[envKey] ?? extra[key] ?? "";
+const env = {
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  useFirebaseEmulators: process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATORS,
+  authEmulatorHost: process.env.EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST,
+  authEmulatorPort: process.env.EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_PORT,
+  firestoreEmulatorHost:
+    process.env.EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_HOST,
+  firestoreEmulatorPort:
+    process.env.EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_PORT,
+  storageEmulatorHost: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_HOST,
+  storageEmulatorPort: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_PORT,
+};
+
+function readConfigValue(key: keyof FirebaseConfig, envValue: string | undefined) {
+  return envValue ?? extra[key] ?? "";
 }
 
-function readEnvValue(envKey: string) {
-  return process.env[envKey] ?? extra[envKey] ?? "";
+function readEnvValue(
+  extraKey: string,
+  envValue: string | undefined,
+) {
+  return envValue ?? extra[extraKey] ?? "";
 }
 
 function parseBoolean(value: string | undefined) {
@@ -32,22 +53,20 @@ function parsePort(value: string | undefined, fallback: number) {
 }
 
 export const firebaseConfig: FirebaseConfig = {
-  apiKey: readConfigValue("apiKey", "EXPO_PUBLIC_FIREBASE_API_KEY"),
-  authDomain: readConfigValue("authDomain", "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN"),
-  projectId: readConfigValue("projectId", "EXPO_PUBLIC_FIREBASE_PROJECT_ID"),
-  storageBucket: readConfigValue(
-    "storageBucket",
-    "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET",
-  ),
+  apiKey: readConfigValue("apiKey", env.apiKey),
+  authDomain: readConfigValue("authDomain", env.authDomain),
+  projectId: readConfigValue("projectId", env.projectId),
+  storageBucket: readConfigValue("storageBucket", env.storageBucket),
   messagingSenderId: readConfigValue(
     "messagingSenderId",
-    "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
+    env.messagingSenderId,
   ),
-  appId: readConfigValue("appId", "EXPO_PUBLIC_FIREBASE_APP_ID"),
+  appId: readConfigValue("appId", env.appId),
 };
 
 const hasExplicitEmulatorToggle =
-  readEnvValue("EXPO_PUBLIC_USE_FIREBASE_EMULATORS") !== "";
+  readEnvValue("EXPO_PUBLIC_USE_FIREBASE_EMULATORS", env.useFirebaseEmulators) !==
+  "";
 const isDevRuntime =
   typeof __DEV__ !== "undefined"
     ? __DEV__
@@ -56,24 +75,41 @@ const isDevRuntime =
 export const firebaseEmulatorConfig = {
   // Default to emulators in development to prevent accidental writes to cloud data.
   enabled: hasExplicitEmulatorToggle
-    ? parseBoolean(readEnvValue("EXPO_PUBLIC_USE_FIREBASE_EMULATORS"))
+    ? parseBoolean(
+        readEnvValue("EXPO_PUBLIC_USE_FIREBASE_EMULATORS", env.useFirebaseEmulators),
+      )
     : isDevRuntime,
   authHost:
-    readEnvValue("EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST") || "127.0.0.1",
+    readEnvValue(
+      "EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST",
+      env.authEmulatorHost,
+    ) || "127.0.0.1",
   authPort: parsePort(
-    readEnvValue("EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_PORT"),
+    readEnvValue("EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_PORT", env.authEmulatorPort),
     9099,
   ),
   firestoreHost:
-    readEnvValue("EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_HOST") || "127.0.0.1",
+    readEnvValue(
+      "EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_HOST",
+      env.firestoreEmulatorHost,
+    ) || "127.0.0.1",
   firestorePort: parsePort(
-    readEnvValue("EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_PORT"),
+    readEnvValue(
+      "EXPO_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_PORT",
+      env.firestoreEmulatorPort,
+    ),
     8080,
   ),
   storageHost:
-    readEnvValue("EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_HOST") || "127.0.0.1",
+    readEnvValue(
+      "EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_HOST",
+      env.storageEmulatorHost,
+    ) || "127.0.0.1",
   storagePort: parsePort(
-    readEnvValue("EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_PORT"),
+    readEnvValue(
+      "EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_PORT",
+      env.storageEmulatorPort,
+    ),
     9199,
   ),
 };

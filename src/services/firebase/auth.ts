@@ -9,10 +9,25 @@ import {
   updatePassword,
   updateProfile,
 } from "firebase/auth";
+import type { FirebaseError } from "firebase/app";
 
 import { auth } from "@/src/services/firebase/app";
 
 export type AuthListener = (user: User | null) => void;
+
+function getAuthErrorMessage(error: unknown) {
+  const code = (error as FirebaseError | undefined)?.code;
+
+  if (code === "auth/configuration-not-found") {
+    return "Authentication is not configured for this Firebase project. In Firebase Console, enable Authentication and turn on Email/Password sign-in for the production project.";
+  }
+
+  if (code === "auth/operation-not-allowed") {
+    return "Email/Password sign-in is disabled for this Firebase project. Enable it in Firebase Console > Authentication > Sign-in method.";
+  }
+
+  return (error as Error)?.message ?? "Authentication failed. Please try again.";
+}
 
 function requireAuth() {
   if (!auth) {
@@ -26,7 +41,11 @@ function requireAuth() {
 
 export async function login(email: string, password: string) {
   const authClient = requireAuth();
-  return signInWithEmailAndPassword(authClient, email.trim(), password);
+  try {
+    return await signInWithEmailAndPassword(authClient, email.trim(), password);
+  } catch (error) {
+    throw new Error(getAuthErrorMessage(error));
+  }
 }
 
 export async function signup(
@@ -35,13 +54,17 @@ export async function signup(
   password: string,
 ) {
   const authClient = requireAuth();
-  const credential = await createUserWithEmailAndPassword(
-    authClient,
-    email.trim(),
-    password,
-  );
-  await updateProfile(credential.user, { displayName });
-  return credential;
+  try {
+    const credential = await createUserWithEmailAndPassword(
+      authClient,
+      email.trim(),
+      password,
+    );
+    await updateProfile(credential.user, { displayName });
+    return credential;
+  } catch (error) {
+    throw new Error(getAuthErrorMessage(error));
+  }
 }
 
 export async function logout() {
