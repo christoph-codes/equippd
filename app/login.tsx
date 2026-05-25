@@ -7,6 +7,7 @@ import { Button } from "@/src/components/ui/Button";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { TextInput } from "@/src/components/ui/TextInput";
 import { useAuth } from "@/src/hooks/useAuth";
+import { brand } from "@/src/theme/brand";
 import { colors } from "@/src/theme/colors";
 
 export default function LoginScreen() {
@@ -32,9 +33,7 @@ export default function LoginScreen() {
   return (
     <ScreenContainer edges={["top", "left", "right"]} centered>
       <BrandLogo width={160} />
-      <Text style={styles.subtitle}>
-        Strengthen your walk through studies, notes, and brotherhood.
-      </Text>
+      <Text style={styles.subtitle}>{brand.loginSubtitle}</Text>
       <View style={styles.form}>
         <TextInput
           autoCapitalize="none"

@@ -26,7 +26,11 @@ import {
 } from "@/src/services/firebase/messages";
 import { colors } from "@/src/theme/colors";
 
-type Candidate = { userId: string; displayName: string; photoURL?: string | null };
+type Candidate = {
+  userId: string;
+  displayName: string;
+  photoURL?: string | null;
+};
 
 export default function MessagesScreen() {
   const router = useRouter();
@@ -37,7 +41,9 @@ export default function MessagesScreen() {
   const [isLoadingThreads, setIsLoadingThreads] = useState(true);
   const [threadsError, setThreadsError] = useState<string | null>(null);
   const [isLoadingCandidates, setIsLoadingCandidates] = useState(false);
-  const [isStartingChatWith, setIsStartingChatWith] = useState<string | null>(null);
+  const [isStartingChatWith, setIsStartingChatWith] = useState<string | null>(
+    null,
+  );
   const [pickerVisible, setPickerVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -158,13 +164,15 @@ export default function MessagesScreen() {
       } catch (err) {
         console.error("Failed to start chat:", err);
         let message = "We couldn't open this conversation. Please try again.";
-        if (err && typeof err === "object" && "message" in err && typeof err.message === "string") {
+        if (
+          err &&
+          typeof err === "object" &&
+          "message" in err &&
+          typeof err.message === "string"
+        ) {
           message = err.message;
         }
-        Alert.alert(
-          "Could not start chat",
-          message,
-        );
+        Alert.alert("Could not start chat", message);
       } finally {
         setIsStartingChatWith(null);
       }
@@ -180,14 +188,25 @@ export default function MessagesScreen() {
       : "No messages yet";
 
     return (
-      <Pressable key={item.id} onPress={() => openThread(item)} style={styles.pressable}>
+      <Pressable
+        key={item.id}
+        onPress={() => openThread(item)}
+        style={styles.pressable}
+      >
         {({ pressed }) => (
-          <Card style={[styles.threadCard, pressed && styles.threadCardPressed]}>
+          <Card
+            style={[styles.threadCard, pressed && styles.threadCardPressed]}
+          >
             <View style={styles.threadHeaderRow}>
-              <Text style={styles.threadName}>{item.otherParticipant.displayName}</Text>
+              <Text style={styles.threadName}>
+                {item.otherParticipant.displayName}
+              </Text>
               {item.unread ? <View style={styles.unreadDot} /> : null}
             </View>
-            <Text style={[styles.preview, item.unread && styles.previewUnread]} numberOfLines={1}>
+            <Text
+              style={[styles.preview, item.unread && styles.previewUnread]}
+              numberOfLines={1}
+            >
               {preview}
             </Text>
           </Card>
@@ -258,7 +277,10 @@ export default function MessagesScreen() {
       {/* Floating action button */}
       <Pressable
         onPress={openPicker}
-        style={({ pressed }) => [styles.floatingButton, pressed && styles.floatingButtonPressed]}
+        style={({ pressed }) => [
+          styles.floatingButton,
+          pressed && styles.floatingButtonPressed,
+        ]}
       >
         <Ionicons name="add" size={28} color={colors.background} />
       </Pressable>
@@ -287,7 +309,9 @@ export default function MessagesScreen() {
         ) : filteredCandidates.length === 0 ? (
           <View style={styles.pickerLoading}>
             <Text style={styles.pickerEmpty}>
-              {searchQuery.trim() ? "No matches found." : "No other users found."}
+              {searchQuery.trim()
+                ? "No matches found."
+                : "No other users found."}
             </Text>
           </View>
         ) : (

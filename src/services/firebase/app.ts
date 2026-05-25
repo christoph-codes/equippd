@@ -76,9 +76,14 @@ if (isFirebaseConfigured()) {
   storage = getStorage(app);
 
   const isDevRuntime =
-    typeof __DEV__ !== "undefined" ? __DEV__ : process.env.NODE_ENV !== "production";
+    typeof __DEV__ !== "undefined"
+      ? __DEV__
+      : process.env.NODE_ENV !== "production";
 
-  if (isDevRuntime && !emulatorGlobalState.__equippdFirebaseBackendDebugLogged) {
+  if (
+    isDevRuntime &&
+    !emulatorGlobalState.__equippdFirebaseBackendDebugLogged
+  ) {
     if (firebaseEmulatorConfig.enabled) {
       console.log(
         `[Firebase] Backend=emulator auth=${firebaseEmulatorConfig.authHost}:${firebaseEmulatorConfig.authPort} firestore=${firebaseEmulatorConfig.firestoreHost}:${firebaseEmulatorConfig.firestorePort} storage=${firebaseEmulatorConfig.storageHost}:${firebaseEmulatorConfig.storagePort}`,

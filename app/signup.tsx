@@ -13,6 +13,7 @@ import { Button } from "@/src/components/ui/Button";
 import { ScreenContainer } from "@/src/components/ui/ScreenContainer";
 import { TextInput } from "@/src/components/ui/TextInput";
 import { useAuth } from "@/src/hooks/useAuth";
+import { brand } from "@/src/theme/brand";
 import { colors } from "@/src/theme/colors";
 
 export default function SignupScreen() {
@@ -45,9 +46,7 @@ export default function SignupScreen() {
         <View style={styles.logoWrap}>
           <BrandLogo width={160} />
         </View>
-        <Text style={styles.subtitle}>
-          Join Equippd to strengthen your walk through community and studies.
-        </Text>
+        <Text style={styles.subtitle}>{brand.signupSubtitle}</Text>
         <View style={styles.form}>
           <TextInput
             label="Display name"

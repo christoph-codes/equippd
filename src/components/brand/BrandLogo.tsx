@@ -1,19 +1,23 @@
 import { Image } from "expo-image";
 import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
+import { brandAssets } from "@/src/theme/brand";
 import { colors } from "@/src/theme/colors";
 
 type Props = {
   width?: number;
 };
 
-const logo = require("../../../assets/images/equippd_logo_desert.svg");
 const logoRatio = 999 / 411;
 
 export function BrandLogo({ width = 140 }: Props) {
   return (
     <View style={[styles.frame, { width, height: width / logoRatio }]}>
-      <Image contentFit="contain" source={logo} style={styles.image} />
+      <Image
+        contentFit="contain"
+        source={brandAssets.primaryLogo}
+        style={styles.image}
+      />
     </View>
   );
 }

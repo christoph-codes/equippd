@@ -21,8 +21,8 @@ import { EmptyState } from "@/src/components/ui/EmptyState";
 import { useAuth } from "@/src/hooks/useAuth";
 import { ChatMessage, MessageThreadSummary } from "@/src/models/types";
 import {
-  markThreadAsRead,
   fetchOlderThreadMessages,
+  markThreadAsRead,
   MessagePage,
   sendMessageToThread,
   subscribeToThreadMessages,
@@ -92,9 +92,7 @@ const MessageRow = memo(
       <View
         style={[
           styles.messageRow,
-          isCurrentUser
-            ? styles.messageRowCurrentUser
-            : styles.messageRowOther,
+          isCurrentUser ? styles.messageRowCurrentUser : styles.messageRowOther,
         ]}
       >
         <View
@@ -210,8 +208,7 @@ export default function ChatThreadScreen() {
         (nextMessages) => {
           setMessages((previousMessages) => {
             shouldScrollToBottomRef.current =
-              previousMessages.length === 0 ||
-              isListAtBottom();
+              previousMessages.length === 0 || isListAtBottom();
             const nextMessageIds = new Set(
               nextMessages.map((message) => message.id),
             );
