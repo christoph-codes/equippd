@@ -1,0 +1,176 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function hasParticipant(data, userId) {
+      return isSignedIn() &&
+        data != null &&
+        data.participantIds is list &&
+        data.participantIds.hasAny([userId]);
+    }
+
+    function isDirectThreadData(data) {
+      return data != null &&
+        data.participantIds is list &&
+        data.participantIds.size() == 2;
+    }
+
+    function isResourceOwnerData(data) {
+      return data != null &&
+        data.keys().hasAny(['userId']) &&
+        data.userId == request.auth.uid;
+    }
+
+    function hasAdminUserProfileRole() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        request.auth.token.role == 'admin' ||
+        hasAdminUserProfileRole()
+      );
+    }
+
+    function doesNotWriteRole() {
+      return !request.resource.data.keys().hasAny(['role']);
+    }
+
+    function roleIsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']);
+    }
+
+    function isResourceOwnerByUserId() {
+      return isSignedIn() &&
+        resource.data != null &&
+        isResourceOwnerData(resource.data);
+    }
+
+    function isPendingSelfAccessRequest(userId) {
+      return isSelf(userId) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.status == 'pending';
+    }
+
+    function keepsAccessRequestIdentityFields() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'groupId',
+        'groupSlug',
+        'groupName',
+        'userId'
+      ]);
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSelf(userId) && doesNotWriteRole();
+      allow update: if isSelf(userId) && roleIsUnchanged();
+      allow delete: if false;
+
+      match /threads/{threadId} {
+        allow read: if isSelf(userId);
+        allow create, update: if isSignedIn() &&
+          hasParticipant(request.resource.data, request.auth.uid) &&
+          hasParticipant(request.resource.data, userId) &&
+          isDirectThreadData(request.resource.data);
+        allow delete: if false;
+      }
+    }
+
+    match /threads/{threadId} {
+      allow read: if resource != null &&
+        hasParticipant(resource.data, request.auth.uid);
+      allow create: if hasParticipant(request.resource.data, request.auth.uid) && isDirectThreadData(request.resource.data);
+      allow update: if resource != null &&
+        hasParticipant(resource.data, request.auth.uid) &&
+        isDirectThreadData(resource.data);
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if isSignedIn() &&
+          hasParticipant(get(/databases/$(database)/documents/threads/$(threadId)).data, request.auth.uid);
+        allow create: if isSignedIn() &&
+          request.resource.data.threadId == threadId &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 &&
+          hasParticipant(get(/databases/$(database)/documents/threads/$(threadId)).data, request.auth.uid);
+        allow update, delete: if false;
+      }
+    }
+
+    match /groups/{groupId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+
+      match /members/{userId} {
+        // Use resource ownership for read so collectionGroup queries can be authorized.
+        allow read: if isAdmin() || isResourceOwnerByUserId();
+        allow write: if isAdmin();
+      }
+
+      match /accessRequests/{userId} {
+        allow read: if isAdmin() || isResourceOwnerByUserId();
+        allow create: if isPendingSelfAccessRequest(userId);
+        allow update: if isAdmin() || (
+          isPendingSelfAccessRequest(userId) &&
+          keepsAccessRequestIdentityFields()
+        );
+        allow delete: if isAdmin();
+      }
+    }
+
+    match /{path=**}/members/{userId} {
+      // Explicit collection group rules are required for collectionGroup(db, 'members').
+      allow read: if isAdmin() || isResourceOwnerByUserId();
+      allow write: if isAdmin();
+    }
+
+    match /{path=**}/accessRequests/{userId} {
+      // Explicit collection group rules are required for collectionGroup(db, 'accessRequests').
+      allow read: if isAdmin() || isResourceOwnerByUserId();
+      allow create: if isPendingSelfAccessRequest(userId);
+      allow update: if isAdmin() || (
+        isPendingSelfAccessRequest(userId) &&
+        keepsAccessRequestIdentityFields()
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /notes/{noteId} {
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow read: if isSignedIn() && (request.auth.uid == resource.data.userId || isAdmin());
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    match /studies/{studyId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /studyReactions/{reactionId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    match /songs/{songId} {
+      allow read: if isSignedIn() && (resource.data.status == 'approved' || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.submittedBy && (request.resource.data.status == 'pending' || (isAdmin() && request.resource.data.status == 'approved'));
+      allow update: if isAdmin() && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['submittedBy', 'submittedByDisplayName', 'createdAt'])
+      );
+      allow delete: if isAdmin();
+    }
+  }
+}
