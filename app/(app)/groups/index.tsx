@@ -46,6 +46,7 @@ export default function GroupsScreen() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [requestModalVisible, setRequestModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [creatingGroup, setCreatingGroup] = useState(false);
@@ -53,12 +54,21 @@ export default function GroupsScreen() {
   const [groupSlug, setGroupSlug] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
 
+  function getErrorMessage(error: unknown) {
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+
+    return "Unable to load groups right now.";
+  }
+
   const loadGroups = useCallback(async () => {
     if (!user) {
       return;
     }
 
     setLoading(true);
+    setLoadError(null);
     try {
       const [nextGroups, nextMemberships, nextRequests, nextPendingRequests] =
         await Promise.all([
@@ -72,6 +82,8 @@ export default function GroupsScreen() {
       setMemberships(nextMemberships);
       setRequests(nextRequests);
       setPendingRequests(nextPendingRequests);
+    } catch (error) {
+      setLoadError(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -81,11 +93,6 @@ export default function GroupsScreen() {
     setRefreshing(true);
     try {
       await loadGroups();
-    } catch {
-      setGroups([]);
-      setMemberships([]);
-      setRequests([]);
-      setPendingRequests([]);
     } finally {
       setRefreshing(false);
     }
@@ -96,12 +103,7 @@ export default function GroupsScreen() {
       return;
     }
 
-    void loadGroups().catch(() => {
-      setGroups([]);
-      setMemberships([]);
-      setRequests([]);
-      setPendingRequests([]);
-    });
+    void loadGroups();
   }, [loadGroups, user]);
 
   const groupById = useMemo(
@@ -273,6 +275,13 @@ export default function GroupsScreen() {
             : "View your groups and request access to more."}
         </ScreenIntro>
 
+        {loadError ? (
+          <Card>
+            <Text style={styles.loadErrorTitle}>Group fetch failed</Text>
+            <Text style={styles.loadErrorMessage}>{loadError}</Text>
+          </Card>
+        ) : null}
+
         {isAdmin && pendingRequests.length ? (
           <>
             <SectionHeader title="Pending Access Requests" />
@@ -436,8 +445,12 @@ export default function GroupsScreen() {
             })
           ) : (
             <EmptyState
-              title="No groups available"
-              description="Groups will appear here after an admin creates them."
+              title={loadError ? "Unable to load groups" : "No groups available"}
+              description={
+                loadError
+                  ? loadError
+                  : "Groups will appear here after an admin creates them."
+              }
             />
           )}
         </ScrollView>
@@ -541,6 +554,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     gap: 8,
+  },
+  loadErrorTitle: {
+    color: colors.danger,
+    ...typography.sectionTitle,
+  },
+  loadErrorMessage: {
+    color: colors.mutedText,
+    ...typography.body,
   },
   statusPill: {
     borderRadius: 999,

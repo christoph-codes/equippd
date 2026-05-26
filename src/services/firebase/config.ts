@@ -32,14 +32,14 @@ const env = {
   storageEmulatorPort: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_EMULATOR_PORT,
 };
 
-function readConfigValue(key: keyof FirebaseConfig, envValue: string | undefined) {
+function readConfigValue(
+  key: keyof FirebaseConfig,
+  envValue: string | undefined,
+) {
   return envValue ?? extra[key] ?? "";
 }
 
-function readEnvValue(
-  extraKey: string,
-  envValue: string | undefined,
-) {
+function readEnvValue(extraKey: string, envValue: string | undefined) {
   return envValue ?? extra[extraKey] ?? "";
 }
 
@@ -65,8 +65,10 @@ export const firebaseConfig: FirebaseConfig = {
 };
 
 const hasExplicitEmulatorToggle =
-  readEnvValue("EXPO_PUBLIC_USE_FIREBASE_EMULATORS", env.useFirebaseEmulators) !==
-  "";
+  readEnvValue(
+    "EXPO_PUBLIC_USE_FIREBASE_EMULATORS",
+    env.useFirebaseEmulators,
+  ) !== "";
 const isDevRuntime =
   typeof __DEV__ !== "undefined"
     ? __DEV__
@@ -74,18 +76,26 @@ const isDevRuntime =
 
 export const firebaseEmulatorConfig = {
   // Default to emulators in development to prevent accidental writes to cloud data.
-  enabled: hasExplicitEmulatorToggle
-    ? parseBoolean(
-        readEnvValue("EXPO_PUBLIC_USE_FIREBASE_EMULATORS", env.useFirebaseEmulators),
-      )
-    : isDevRuntime,
+  enabled: isDevRuntime
+    ? hasExplicitEmulatorToggle
+      ? parseBoolean(
+          readEnvValue(
+            "EXPO_PUBLIC_USE_FIREBASE_EMULATORS",
+            env.useFirebaseEmulators,
+          ),
+        )
+      : true
+    : false,
   authHost:
     readEnvValue(
       "EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST",
       env.authEmulatorHost,
     ) || "127.0.0.1",
   authPort: parsePort(
-    readEnvValue("EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_PORT", env.authEmulatorPort),
+    readEnvValue(
+      "EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_PORT",
+      env.authEmulatorPort,
+    ),
     9099,
   ),
   firestoreHost:

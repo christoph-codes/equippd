@@ -3,8 +3,7 @@ export const brand = {
   authKicker: "Unity in Christ",
   loginTitle: "Welcome back",
   signupTitle: "Create your account",
-  loginSubtitle:
-    "Grow in truth. Stand firm in faith. Live equipped.",
+  loginSubtitle: "Grow in truth and love. Stand firm in faith.",
   signupSubtitle:
     "Join Equippd to grow in unity, faith, and maturity in Christ.",
 };

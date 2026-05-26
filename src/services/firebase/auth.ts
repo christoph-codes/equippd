@@ -1,3 +1,4 @@
+import type { FirebaseError } from "firebase/app";
 import {
   EmailAuthProvider,
   User,
@@ -9,7 +10,6 @@ import {
   updatePassword,
   updateProfile,
 } from "firebase/auth";
-import type { FirebaseError } from "firebase/app";
 
 import { auth } from "@/src/services/firebase/app";
 
@@ -26,7 +26,9 @@ function getAuthErrorMessage(error: unknown) {
     return "Email/Password sign-in is disabled for this Firebase project. Enable it in Firebase Console > Authentication > Sign-in method.";
   }
 
-  return (error as Error)?.message ?? "Authentication failed. Please try again.";
+  return (
+    (error as Error)?.message ?? "Authentication failed. Please try again."
+  );
 }
 
 function requireAuth() {

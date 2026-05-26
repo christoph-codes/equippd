@@ -1,119 +1,150 @@
 {
-  "indexes": [
-    {
-      "collectionGroup": "notes",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "userId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "updatedAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "notes",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "groupSlug",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "updatedAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "notes",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "userId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "groupSlug",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "updatedAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "notes",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "groupSlug",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "studySlug",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "updatedAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "notes",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "userId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "groupSlug",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "studySlug",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "updatedAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "studies",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "groupSlug",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "slug",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "studyReactions",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "groupSlug",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "studySlug",
-          "order": "ASCENDING"
-        }
-      ]
-    }
-  ],
-  "fieldOverrides": []
+	"indexes": [
+		{
+			"collectionGroup": "notes",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "userId",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "updatedAt",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "notes",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "groupSlug",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "updatedAt",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "notes",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "userId",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "groupSlug",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "updatedAt",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "notes",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "groupSlug",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "studySlug",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "updatedAt",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "notes",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "userId",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "groupSlug",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "studySlug",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "updatedAt",
+					"order": "DESCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "studies",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "groupSlug",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "slug",
+					"order": "ASCENDING"
+				}
+			]
+		},
+		{
+			"collectionGroup": "studyReactions",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{
+					"fieldPath": "groupSlug",
+					"order": "ASCENDING"
+				},
+				{
+					"fieldPath": "studySlug",
+					"order": "ASCENDING"
+				}
+			]
+		}
+	],
+	"fieldOverrides": [
+		{
+			"collectionGroup": "members",
+			"fieldPath": "userId",
+			"indexes": [
+				{
+					"order": "ASCENDING",
+					"queryScope": "COLLECTION_GROUP"
+				}
+			]
+		},
+		{
+			"collectionGroup": "accessRequests",
+			"fieldPath": "userId",
+			"indexes": [
+				{
+					"order": "ASCENDING",
+					"queryScope": "COLLECTION_GROUP"
+				}
+			]
+		},
+		{
+			"collectionGroup": "accessRequests",
+			"fieldPath": "status",
+			"indexes": [
+				{
+					"order": "ASCENDING",
+					"queryScope": "COLLECTION_GROUP"
+				}
+			]
+		}
+	]
 }
